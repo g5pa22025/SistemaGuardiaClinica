@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
     <style>
-        /* Toque visual propio */
+        /* Toque visual propio :) */
         body { background: #f6f8fb; }
         .page-header { border-bottom: 1px solid #e9ecef; }
         .card { border-radius: 1rem; }
