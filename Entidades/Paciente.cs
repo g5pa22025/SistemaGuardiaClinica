@@ -38,8 +38,6 @@ namespace Entidades
 
         public string NumeroAfiliado { get; set; }
 
-        [Required(ErrorMessage = "Prioridad obligatoria")]
-        [Range(1, 5, ErrorMessage = "La prioridad debe estar entre 1 y 5")]
         public int Prioridad { get; set; }
 
         public string Estado { get; set; }

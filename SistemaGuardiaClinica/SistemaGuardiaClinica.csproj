@@ -127,6 +127,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="Default.aspx" />
     <Content Include="Enfermeria\Default.aspx" />
+    <Content Include="Enfermeria\Triage.aspx" />
     <Content Include="Login.aspx" />
     <Content Include="Medicos\Default.aspx" />
     <Content Include="Pacientes\ABM.aspx" />
@@ -233,6 +234,13 @@
     </Compile>
     <Compile Include="Enfermeria\Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Enfermeria\Triage.aspx.cs">
+      <DependentUpon>Triage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Enfermeria\Triage.aspx.designer.cs">
+      <DependentUpon>Triage.aspx</DependentUpon>
     </Compile>
     <Compile Include="Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>

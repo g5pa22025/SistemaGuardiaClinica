@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Datos;       // ClinicaContext
+using Entidades;   // Paciente
+using Negocio.Services;
+using System;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Data.Entity.Validation;
-using System.Data.Entity.Infrastructure;
-using System.Text;
-using Datos;       // ClinicaContext
-using Entidades;   // Paciente
 
 namespace SistemaGuardiaClinica.Pacientes
 {
@@ -36,19 +37,24 @@ namespace SistemaGuardiaClinica.Pacientes
 
             using (var ctx = new ClinicaContext())
             {
-                var q = ctx.Pacientes.AsQueryable();
+                // Estados que consideramos "guardia activa"
+                string[] activos = { "Espera", "Triaje", "Atencion" };
 
-                if (!string.IsNullOrEmpty(dni) || !string.IsNullOrEmpty(ape))
-                {
-                    q = q.Where(p =>
-                        (!string.IsNullOrEmpty(dni) && p.DNI.Contains(dni)) ||
-                        (!string.IsNullOrEmpty(ape) && p.Apellido.ToLower().Contains(ape))
-                    );
-                }
+                // Query base: SOLO pacientes SIN guardia activa
+                var q = ctx.Pacientes
+                    .Where(p => !ctx.Guardias.Any(g => g.PacienteId == p.Id && activos.Contains(g.Estado)));
+
+                // Filtros de búsqueda (DNI / Apellido)
+                if (!string.IsNullOrEmpty(dni))
+                    q = q.Where(p => p.DNI.Contains(dni));
+
+                if (!string.IsNullOrEmpty(ape))
+                    q = q.Where(p => p.Apellido.ToLower().Contains(ape));
 
                 gvPacientes.DataSource = q
                     .OrderBy(p => p.Apellido).ThenBy(p => p.Nombre)
                     .ToList();
+
                 gvPacientes.DataBind();
             }
         }
@@ -73,9 +79,9 @@ namespace SistemaGuardiaClinica.Pacientes
                     return;
                 }
 
-                int prioridad;
-                if (!int.TryParse(txtPrioridad.Text, out prioridad) || prioridad < 1 || prioridad > 5)
-                    throw new Exception("La prioridad debe ser un número entre 1 y 5.");
+                //int prioridad;
+                //if (!int.TryParse(txtPrioridad.Text, out prioridad) || prioridad < 1 || prioridad > 5)
+                //    throw new Exception("La prioridad debe ser un número entre 1 y 5.");
 
                 if (!DateTime.TryParse(txtFechaNacimiento.Text, out var fechaNac))
                     throw new Exception("Fecha de nacimiento inválida.");
@@ -90,10 +96,9 @@ namespace SistemaGuardiaClinica.Pacientes
                     Direccion = (txtDireccion.Text ?? "").Trim(),
                     ObraSocial = (txtObraSocial.Text ?? "").Trim(),
                     NumeroAfiliado = (txtNroAfiliado.Text ?? "").Trim(),
-                    Estado = (txtEstado.Text ?? "").Trim(),
-                    Prioridad = prioridad,
                     Genero = ddlGenero.SelectedValue,
-                    FechaNacimiento = fechaNac
+                    FechaNacimiento = fechaNac,
+                    Prioridad = 1 //Lo seteo por defecto en 1 
                 };
 
                 using (var ctx = new ClinicaContext())
@@ -122,8 +127,7 @@ namespace SistemaGuardiaClinica.Pacientes
 
         private void LimpiarModalAlta()
         {
-            txtDni.Text = txtNombre.Text = txtApellido.Text = txtTelefono.Text = txtEmail.Text =
-            txtDireccion.Text = txtObraSocial.Text = txtNroAfiliado.Text = txtEstado.Text = txtPrioridad.Text = "";
+            txtDni.Text = txtNombre.Text = txtApellido.Text = txtTelefono.Text = txtEmail.Text = "";
             ddlGenero.ClearSelection(); ddlGenero.Items[0].Selected = true;
             txtFechaNacimiento.Text = "";
         }
@@ -136,8 +140,8 @@ namespace SistemaGuardiaClinica.Pacientes
                 if (!int.TryParse(hfEditId.Value, out var id) || id <= 0)
                     throw new Exception("Id inválido.");
 
-                if (!int.TryParse(txtEditPrioridad.Text, out var prioridad) || prioridad < 1 || prioridad > 5)
-                    throw new Exception("La prioridad debe ser un número entre 1 y 5.");
+                //if (!int.TryParse(txtEditPrioridad.Text, out var prioridad) || prioridad < 1 || prioridad > 5)
+                //    throw new Exception("La prioridad debe ser un número entre 1 y 5.");
 
                 if (!DateTime.TryParse(txtEditFechaNac.Text, out var fechaNac))
                     throw new Exception("Fecha de nacimiento inválida.");
@@ -153,8 +157,6 @@ namespace SistemaGuardiaClinica.Pacientes
                     ent.Email = (txtEditEmail.Text ?? "").Trim();
                     ent.ObraSocial = (txtEditObraSocial.Text ?? "").Trim();
                     ent.NumeroAfiliado = (txtEditNroAfiliado.Text ?? "").Trim();
-                    ent.Estado = (txtEditEstado.Text ?? "").Trim();
-                    ent.Prioridad = prioridad;
                     ent.Genero = ddlEditGenero.SelectedValue;
                     ent.FechaNacimiento = fechaNac;
                     ent.Direccion = (txtEditDireccion.Text ?? "").Trim();
@@ -244,6 +246,82 @@ namespace SistemaGuardiaClinica.Pacientes
                 ex = ex.InnerException;
             }
             return sb.ToString();
+        }
+
+        protected void btnConfirmarIngreso_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 1) Leer pacienteId de forma segura
+                if (!int.TryParse(hfIngresoPacienteId.Value, out var pacienteId) || pacienteId <= 0)
+                    throw new Exception("PacienteId inválido.");
+
+                // 2) Prioridad (si viene vacío, la pongo en 1)
+                int prioridad = 1;
+                if (int.TryParse(hfIngresoPrioridad.Value, out var pr))
+                    prioridad = Math.Max(1, Math.Min(5, pr));
+
+                var sintomas = (txtDescSintomas.Text ?? "").Trim();
+
+                using (var ctx = new Datos.ClinicaContext())
+                {
+                    var paciente = ctx.Pacientes.FirstOrDefault(p => p.Id == pacienteId);
+                    if (paciente == null) throw new Exception("Paciente no encontrado.");
+
+                    // 3) Id del recepcionista desde sesión, SIN cast directo
+                    int recepcionistaId = 0;
+
+                    // Si guardaste el Id como número:
+                    if (Session["UsuarioId"] != null)
+                        recepcionistaId = Convert.ToInt32(Session["UsuarioId"]); // <-- evita InvalidCast
+
+                    // Si guardaste el objeto completo:
+                    if (recepcionistaId <= 0 && Session["Usuario"] is Entidades.Usuario u && u.Id > 0)
+                        recepcionistaId = u.Id;
+
+                    if (recepcionistaId <= 0) throw new Exception("Sesión inválida (no se encontró UsuarioId).");
+
+                    // 4) Evitar duplicar guardia activa
+                    var repo = new Datos.Repositorios.GuardiaRepository();
+                    var existente = repo.ObtenerPorPaciente(pacienteId); // Espera/Triaje/Atencion
+                    if (existente != null)
+                    {
+                        phMsg.Controls.Add(new Literal
+                        {
+                            Text = "<div class='alert alert-warning'>El paciente ya posee una guardia en curso.</div>"
+                        });
+                        return;
+                    }
+
+                    // 5) Crear guardia en Espera
+                    var svc = new Negocio.Services.GuardiaService();
+                    svc.IniciarGuardia(paciente, recepcionistaId, sintomas);
+
+                    // 6) Setear prioridad calculada
+                    var guardia = repo.ObtenerPorPaciente(pacienteId);
+                    if (guardia != null)
+                    {
+                        guardia.PrioridadFinal = prioridad;
+                        guardia.Estado = "Espera";
+                        repo.Actualizar(guardia);
+                    }
+                }
+
+                phMsg.Controls.Add(new Literal
+                {
+                    Text = "<div class='alert alert-success'>Ingreso registrado y derivado a Enfermería.</div>"
+                });
+
+                // Refrescar la grilla:
+                BindGrid();
+            }
+            catch (Exception ex)
+            {
+                phMsg.Controls.Add(new Literal
+                {
+                    Text = $"<div class='alert alert-danger'>Error al registrar ingreso: {ex.Message}</div>"
+                });
+            }
         }
     }
 }

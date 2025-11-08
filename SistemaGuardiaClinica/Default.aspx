@@ -34,12 +34,6 @@
                     <i class="bi bi-people-fill"></i>
                     <span>Gestión de Pacientes</span>
                 </a>
-
-                <a runat="server" href="~/Guardia/Ingreso.aspx"
-                   class="btn btn-outline-success d-flex align-items-center gap-2 px-3">
-                    <i class="bi bi-clipboard-plus"></i>
-                    <span>Registrar Ingreso a Guardia</span>
-                </a>
             </div>
         </div>
     </div>
