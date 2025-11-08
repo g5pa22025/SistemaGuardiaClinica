@@ -11,27 +11,53 @@
         .navbar-recepcionista { background-color: #e3f2fd; }
         .navbar-enfermero { background-color: #e8f5e8; }
         .navbar-medico { background-color: #f0f8ff; }
+
+        /* Footer fijo al fondo si la página es corta */
+        body, html {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .wrapper-main {
+            flex: 1 0 auto;
+        }
+        footer.footer-main {
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
     <form id="form1" runat="server">
-        <nav class="navbar navbar-expand-lg navbar-light" id="mainNavbar" runat="server">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <i class="fas fa-hospital"></i> Guardia Clínica
-                </a>
-                <div class="navbar-nav ms-auto">
-                    <asp:Label ID="lblUsuario" runat="server" CssClass="navbar-text me-3"></asp:Label>
-                    <asp:Button ID="btnCerrarSesion" runat="server" Text="Cerrar Sesión" 
-                        CssClass="btn btn-outline-danger btn-sm" OnClick="btnCerrarSesion_Click" />
+        <div class="wrapper-main">
+            <nav class="navbar navbar-expand-lg navbar-light" id="mainNavbar" runat="server">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">
+                        <i class="fas fa-hospital"></i> Guardia Clínica
+                    </a>
+                    <div class="navbar-nav ms-auto">
+                        <asp:Label ID="lblUsuario" runat="server" CssClass="navbar-text me-3"></asp:Label>
+                        <asp:Button ID="btnCerrarSesion" runat="server" Text="Cerrar Sesión" 
+                            CssClass="btn btn-outline-danger btn-sm" OnClick="btnCerrarSesion_Click" />
+                    </div>
                 </div>
+            </nav>
+            
+            <div class="container-fluid mt-3">
+                <asp:ContentPlaceHolder ID="MainContent" runat="server">
+                </asp:ContentPlaceHolder>
             </div>
-        </nav>
-        
-        <div class="container-fluid mt-3">
-            <asp:ContentPlaceHolder ID="MainContent" runat="server">
-            </asp:ContentPlaceHolder>
         </div>
+
+        <%= new string('\n', 20).Replace("\n", "<br />") %> <!-- Esto genera 20 saltos de linea-->
+
+        <!-- Footer -->
+        <footer class="footer-main bg-light border-top py-2 mt-3">
+            <div class="container-fluid text-center small text-muted">
+                &copy; <%= DateTime.Now.Year %> Sistema de Guardia Clínica. Todos los derechos reservados.
+            </div>
+        </footer>
     </form>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

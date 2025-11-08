@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Negocio.Services;
@@ -11,24 +10,38 @@ namespace SistemaGuardiaClinica.Enfermeria
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Cabecera: nombre del usuario (si lo tenés en sesión)
-            if (Session["UsuarioNombre"] != null || Session["Usuario"] is Usuario)
-            {
-                var nombre = Session["UsuarioNombre"] as string;
-                var apellido = Session["UsuarioApellido"] as string;
-                if (string.IsNullOrWhiteSpace(nombre) && Session["Usuario"] is Usuario u)
-                {
-                    nombre = u.Nombre; apellido = u.Apellido;
-                }
-                litUsuario.Text = $"{apellido}, {nombre}".Trim(new[] { ' ', ',' });
-            }
-            else
-            {
-                litUsuario.Text = "Usuario";
-            }
+            SetUsuarioEnHeader();
 
             if (!IsPostBack)
                 Bind();
+        }
+
+        private void SetUsuarioEnHeader()
+        {
+            // Buscar el Label del master
+            var lblUsuario = Master.FindControl("lblUsuario") as Label;
+            if (lblUsuario == null) return;
+
+            string nombre = null;
+            string apellido = null;
+
+            if (Session["UsuarioNombre"] != null)
+            {
+                nombre = Session["UsuarioNombre"] as string;
+                apellido = Session["UsuarioApellido"] as string;
+            }
+
+            if ((string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(apellido)) &&
+                Session["Usuario"] is Usuario u)
+            {
+                nombre = u.Nombre;
+                apellido = u.Apellido;
+            }
+
+            if (!string.IsNullOrWhiteSpace(nombre) || !string.IsNullOrWhiteSpace(apellido))
+                lblUsuario.Text = $"{apellido}, {nombre}".Trim(' ', ',');
+            else
+                lblUsuario.Text = "Usuario";
         }
 
         private void Bind()
@@ -76,22 +89,19 @@ namespace SistemaGuardiaClinica.Enfermeria
                 if (!int.TryParse(hfEditGuardiaId.Value, out var guardiaId) || guardiaId <= 0)
                     throw new Exception("Guardia inválida.");
 
-                // leemos valores desde los controles
                 var sintomas = (txtEditSintomas.Text ?? "").Trim();
 
                 int prioridad = 1;
                 if (int.TryParse(hfEditPrioridad.Value, out var pr))
                     prioridad = Math.Max(1, Math.Min(5, pr));
 
-                // actualizar en BD
                 var repo = new Datos.Repositorios.GuardiaRepository();
                 var g = repo.ObtenerPorId(guardiaId);
                 if (g == null) throw new Exception("No se encontró la guardia.");
 
-                // si el enfermero dice que no cambió, igual podemos reconfirmar
-                g.Sintomas = sintomas;            // actualiza si cambió el texto
-                g.PrioridadFinal = prioridad;     // confirmar o ajustar
-                g.Estado = "Espera";              // sigue listado en espera hasta que abra TriageDetalle
+                g.Sintomas = sintomas;
+                g.PrioridadFinal = prioridad;
+                g.Estado = "Espera";
 
                 repo.Actualizar(g);
 

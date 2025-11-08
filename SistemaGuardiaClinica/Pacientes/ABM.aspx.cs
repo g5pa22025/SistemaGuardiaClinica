@@ -97,7 +97,8 @@ namespace SistemaGuardiaClinica.Pacientes
                     ObraSocial = (txtObraSocial.Text ?? "").Trim(),
                     NumeroAfiliado = (txtNroAfiliado.Text ?? "").Trim(),
                     Genero = ddlGenero.SelectedValue,
-                    FechaNacimiento = fechaNac
+                    FechaNacimiento = fechaNac,
+                    Prioridad = 1 //Lo seteo por defecto en 1 
                 };
 
                 using (var ctx = new ClinicaContext())
