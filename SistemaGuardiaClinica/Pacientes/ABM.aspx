@@ -57,7 +57,6 @@
                     AutoGenerateColumns="False"
                     DataKeyNames="Id">
                     <Columns>
-                        <asp:BoundField DataField="Id" HeaderText="Id" ReadOnly="true" />
                         <asp:BoundField DataField="DNI" HeaderText="DNI" ReadOnly="true" />
                         <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
                         <asp:BoundField DataField="Apellido" HeaderText="Apellido" />
@@ -66,8 +65,7 @@
                         <asp:BoundField DataField="Email" HeaderText="Email" />
                         <asp:BoundField DataField="ObraSocial" HeaderText="Obra Social" />
                         <asp:BoundField DataField="NumeroAfiliado" HeaderText="Afiliado" />
-                        <asp:BoundField DataField="Prioridad" HeaderText="Prioridad" />
-                        <asp:BoundField DataField="Estado" HeaderText="Estado" />
+                        
                         <asp:TemplateField HeaderText="Fecha Nacimiento">
                             <ItemTemplate>
                                 <%# Eval("FechaNacimiento", "{0:dd/MM/yyyy}") %>
@@ -77,40 +75,55 @@
 
                         <%-- Acciones lindas --%>
                         <asp:TemplateField HeaderText="Acciones">
-                            <ItemTemplate>
-                                <div class="d-flex gap-2 action-buttons">
-                                    <button type="button" class="btn btn-sm btn-outline-warning"
-                                        title="Editar"
-                                        onclick='openEditModal(
-                                            "<%# Eval("Id") %>",
-                                            "<%# Eval("DNI") %>",
-                                            "<%# Eval("Nombre").ToString().Replace("\"","\\\"") %>",
-                                            "<%# Eval("Apellido").ToString().Replace("\"","\\\"") %>",
-                                            "<%# Eval("Genero") %>",
-                                            "<%# Eval("Telefono") %>",
-                                            "<%# Eval("Email") %>",
-                                            "<%# Eval("ObraSocial") %>",
-                                            "<%# Eval("NumeroAfiliado") %>",
-                                            "<%# Eval("Prioridad") %>",
-                                            "<%# Eval("Estado").ToString().Replace("\"","\\\"") %>",
-                                            "<%# ((DateTime)Eval("FechaNacimiento")).ToString("yyyy-MM-dd") %>"
-                                            "<%# (Eval("Direccion") ?? "").ToString().Replace("\"","\\\"") %>" 
-                                        )'> 
-                                        <!-- 
-                                            Uso (Eval("Campo") ?? "") para evitar null 
-                                            Replace("\"","\\\"") evita romper la cadena JS si hay comillas en el texto.
-                                        -->
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+                    <ItemTemplate>
+                        <div class="d-flex gap-2 action-buttons">
+            
+                        <!-- Registrar ingreso (abre modal) -->
+                        <button type="button"
+                            class="btn btn-success btn-sm d-flex align-items-center"
+                            title="Registrar ingreso del paciente a la guardia"
+                            onclick='openIngresoModal(
+                                "<%# Eval("Id") %>",
+                                "<%# (Eval("Apellido") + ", " + Eval("Nombre")).ToString().Replace("\"","\\\"") %>",
+                                "<%# Eval("DNI") %>"
+                                )'>
+                            <i class="bi bi-clipboard-plus me-1"></i> Registrar Ingreso
+                        </button>
 
-                                    <button type="button" class="btn btn-sm btn-outline-danger"
-                                        title="Eliminar"
-                                        onclick='openDeleteModal("<%# Eval("Id") %>", "<%# Eval("DNI") %>", "<%# (Eval("Apellido") + ", " + Eval("Nombre")).ToString().Replace("\"","\\\"") %>")'>
-                                        <i class="bi bi-trash3"></i>
-                                    </button>
-                                </div>
-                            </ItemTemplate>
-                        </asp:TemplateField>
+                            <!-- ✏️ Editar -->
+                            <button type="button" class="btn btn-sm btn-outline-warning"
+                            title="Editar paciente"
+                            onclick='openEditModal(
+                                "<%# Eval("Id") %>",
+                                "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("DNI")) ?? "") %>",
+                                "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("Nombre")) ?? "") %>",
+                                "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("Apellido")) ?? "") %>",
+                                "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("Genero")) ?? "") %>",
+                                "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("Telefono")) ?? "") %>",
+                                "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("Email")) ?? "") %>",
+                                "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("ObraSocial")) ?? "") %>",
+                                "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("NumeroAfiliado")) ?? "") %>",
+                                "<%# (Eval("FechaNacimiento") == null ? "" : ((DateTime)Eval("FechaNacimiento")).ToString("yyyy-MM-dd")) %>",
+                                "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("Direccion")) ?? "") %>"
+                             )'>
+                                <i class="bi bi-pencil-square"></i>
+                        </button>
+
+                         <!-- 🔴 Eliminar -->
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                            title="Eliminar paciente"
+                            onclick='openDeleteModal(
+                                "<%# Eval("Id") %>", 
+                                "<%# Eval("DNI") %>", 
+                                "<%# (Eval("Apellido") + ", " + Eval("Nombre")).ToString().Replace("\"","\\\"") %>"
+                            )'>
+                            <i class="bi bi-trash3"></i>
+                        </button>
+
+                    </div>
+                        </ItemTemplate>
+                    </asp:TemplateField>
+
                     </Columns>
                 </asp:GridView>
             </div>
@@ -120,189 +133,257 @@
     <!-- Hidden fields para modales -->
     <asp:HiddenField ID="hfEditId" runat="server" />
     <asp:HiddenField ID="hfDeleteId" runat="server" />
+    <asp:HiddenField ID="hfIngresoPacienteId" runat="server" />
+    <asp:HiddenField ID="hfIngresoPrioridad" runat="server" />
+
 
     <!-- ================= MODAL ALTA ================= -->
-    <div class="modal fade" id="modalAlta" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i> Nuevo Paciente</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+<div class="modal fade" id="modalAlta" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-person-plus me-2"></i> Nuevo Paciente
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <!-- IDENTIFICACIÓN -->
+          <div class="col-12">
+            <h6 class="text-uppercase text-muted mb-2">Identificación</h6>
+            <hr class="mt-0 mb-3" />
           </div>
-          <div class="modal-body">
-            <div class="row g-3">
 
-              <div class="col-md-3">
-                <label class="form-label">DNI</label>
-                <asp:TextBox ID="txtDni" runat="server" CssClass="form-control" MaxLength="12" />
-                <asp:RequiredFieldValidator ControlToValidate="txtDni" runat="server" CssClass="text-danger" ErrorMessage="DNI obligatorio" Display="Dynamic" ValidationGroup="alta" />
-              </div>
+          <div class="col-md-3">
+            <div class="form-floating">
+                <asp:TextBox ID="txtDni" runat="server" CssClass="form-control" 
+                 MaxLength="8" placeholder="DNI"
+                 onkeypress="return soloNumeros(event)"
+                 oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+             <label for="txtDni">DNI</label>
+        </div>
+            <asp:RequiredFieldValidator ControlToValidate="txtDni" runat="server"
+                CssClass="text-danger" ErrorMessage="DNI obligatorio"
+                Display="Dynamic" ValidationGroup="alta" />
+            </div>
 
-              <div class="col-md-3">
-                <label class="form-label">Prioridad (1-5)</label>
-                <asp:TextBox ID="txtPrioridad" runat="server" CssClass="form-control" TextMode="Number" />
-                <asp:RequiredFieldValidator ControlToValidate="txtPrioridad" runat="server" CssClass="text-danger" ErrorMessage="Prioridad obligatoria" Display="Dynamic" ValidationGroup="alta" />
-              </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control" placeholder="Nombre" />
+              <label for="txtNombre">Nombre</label>
+            </div>
+            <asp:RequiredFieldValidator ControlToValidate="txtNombre" runat="server"
+              CssClass="text-danger" ErrorMessage="Nombre obligatorio"
+              Display="Dynamic" ValidationGroup="alta" />
+          </div>
 
-              <div class="col-md-3">
-                <label class="form-label">Estado</label>
-                <asp:TextBox ID="txtEstado" runat="server" CssClass="form-control" />
-              </div>
+          <div class="col-md-5">
+            <div class="form-floating">
+              <asp:TextBox ID="txtApellido" runat="server" CssClass="form-control" placeholder="Apellido" />
+              <label for="txtApellido">Apellido</label>
+            </div>
+            <asp:RequiredFieldValidator ControlToValidate="txtApellido" runat="server"
+              CssClass="text-danger" ErrorMessage="Apellido obligatorio"
+              Display="Dynamic" ValidationGroup="alta" />
+          </div>
 
-              <div class="col-md-3">
-                <label class="form-label">Teléfono</label>
-                <asp:TextBox ID="txtTelefono" runat="server" CssClass="form-control" />
-              </div>
+          <div class="col-md-4">
+            <label class="form-label">Género</label>
+            <asp:DropDownList ID="ddlGenero" runat="server" CssClass="form-select">
+              <asp:ListItem Value="" Selected="True">-- Seleccione --</asp:ListItem>
+              <asp:ListItem Value="Masculino">Masculino</asp:ListItem>
+              <asp:ListItem Value="Femenino">Femenino</asp:ListItem>
+              <asp:ListItem Value="Otro">Otro</asp:ListItem>
+              <asp:ListItem Value="No informa">No informa</asp:ListItem>
+            </asp:DropDownList>
+            <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlGenero"
+              InitialValue="" CssClass="text-danger" Display="Dynamic"
+              ErrorMessage="Género obligatorio" ValidationGroup="alta" />
+          </div>
 
-              <div class="col-md-4">
-                <label class="form-label">Nombre</label>
-                <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control" />
-                <asp:RequiredFieldValidator ControlToValidate="txtNombre" runat="server" CssClass="text-danger" ErrorMessage="Nombre obligatorio" Display="Dynamic" ValidationGroup="alta" />
-              </div>
+          <div class="col-md-4">
+            <label class="form-label">Fecha de Nacimiento</label>
+            <asp:TextBox ID="txtFechaNacimiento" runat="server" CssClass="form-control" TextMode="Date" />
+            <asp:RequiredFieldValidator runat="server" ControlToValidate="txtFechaNacimiento"
+              CssClass="text-danger" Display="Dynamic"
+              ErrorMessage="Fecha de nacimiento obligatoria" ValidationGroup="alta" />
+          </div>
 
-              <div class="col-md-4">
-                <label class="form-label">Apellido</label>
-                <asp:TextBox ID="txtApellido" runat="server" CssClass="form-control" />
-                <asp:RequiredFieldValidator ControlToValidate="txtApellido" runat="server" CssClass="text-danger" ErrorMessage="Apellido obligatorio" Display="Dynamic" ValidationGroup="alta" />
-              </div>
+          <!-- CONTACTO -->
+          <div class="col-12 mt-2">
+            <h6 class="text-uppercase text-muted mb-2">Contacto</h6>
+            <hr class="mt-0 mb-3" />
+          </div>
 
-              <div class="col-md-4">
-                <label class="form-label">Email</label>
-                <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" TextMode="Email" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Género</label>
-                <asp:DropDownList ID="ddlGenero" runat="server" CssClass="form-select">
-                  <asp:ListItem Value="" Selected="True">-- Seleccione --</asp:ListItem>
-                  <asp:ListItem Value="Masculino">Masculino</asp:ListItem>
-                  <asp:ListItem Value="Femenino">Femenino</asp:ListItem>
-                  <asp:ListItem Value="Otro">Otro</asp:ListItem>
-                  <asp:ListItem Value="No informa">No informa</asp:ListItem>
-                </asp:DropDownList>
-                <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlGenero"
-                    InitialValue="" CssClass="text-danger" Display="Dynamic"
-                    ErrorMessage="Género obligatorio" ValidationGroup="alta" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Fecha de Nacimiento</label>
-                <asp:TextBox ID="txtFechaNacimiento" runat="server" CssClass="form-control" TextMode="Date" />
-                <asp:RequiredFieldValidator runat="server" ControlToValidate="txtFechaNacimiento"
-                    CssClass="text-danger" Display="Dynamic"
-                    ErrorMessage="Fecha de nacimiento obligatoria" ValidationGroup="alta" />
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Dirección</label>
-                <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Obra Social</label>
-                <asp:TextBox ID="txtObraSocial" runat="server" CssClass="form-control" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Nro. Afiliado</label>
-                <asp:TextBox ID="txtNroAfiliado" runat="server" CssClass="form-control" />
-              </div>
-
+          <div class="col-md-4">
+            <div class="form-floating">
+              <asp:TextBox ID="txtTelefono" runat="server" CssClass="form-control" placeholder="Teléfono" />
+              <label for="txtTelefono">Teléfono</label>
             </div>
           </div>
-          <div class="modal-footer">
-            <asp:Button ID="btnGuardarAlta" runat="server" CssClass="btn btn-primary" Text="Guardar" OnClick="btnGuardarAlta_Click" ValidationGroup="alta" />
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- ================= MODAL EDICIÓN ================= -->
-    <div class="modal fade" id="modalEdit" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header bg-warning">
-            <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i> Editar Paciente</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row g-3">
-
-              <div class="col-md-3">
-                <label class="form-label">DNI</label>
-                <asp:TextBox ID="txtEditDni" runat="server" CssClass="form-control bg-light text-muted" ReadOnly="true" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Prioridad (1-5)</label>
-                <asp:TextBox ID="txtEditPrioridad" runat="server" CssClass="form-control" TextMode="Number" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Estado</label>
-                <asp:TextBox ID="txtEditEstado" runat="server" CssClass="form-control" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Teléfono</label>
-                <asp:TextBox ID="txtEditTelefono" runat="server" CssClass="form-control" />
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Nombre</label>
-                <asp:TextBox ID="txtEditNombre" runat="server" CssClass="form-control" />
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Apellido</label>
-                <asp:TextBox ID="txtEditApellido" runat="server" CssClass="form-control" />
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Email</label>
-                <asp:TextBox ID="txtEditEmail" runat="server" CssClass="form-control" TextMode="Email" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Género</label>
-                <asp:DropDownList ID="ddlEditGenero" runat="server" CssClass="form-select">
-                  <asp:ListItem Value="Masculino">Masculino</asp:ListItem>
-                  <asp:ListItem Value="Femenino">Femenino</asp:ListItem>
-                  <asp:ListItem Value="Otro">Otro</asp:ListItem>
-                  <asp:ListItem Value="No informa">No informa</asp:ListItem>
-                </asp:DropDownList>
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Fecha de Nacimiento</label>
-                <asp:TextBox ID="txtEditFechaNac" runat="server" CssClass="form-control" TextMode="Date" />
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Dirección</label>
-                <asp:TextBox ID="txtEditDireccion" runat="server" CssClass="form-control" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Obra Social</label>
-                <asp:TextBox ID="txtEditObraSocial" runat="server" CssClass="form-control" />
-              </div>
-
-              <div class="col-md-3">
-                <label class="form-label">Nro. Afiliado</label>
-                <asp:TextBox ID="txtEditNroAfiliado" runat="server" CssClass="form-control" />
-              </div>
-
+          <div class="col-md-8">
+            <div class="form-floating">
+              <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" TextMode="Email" placeholder="Email" />
+              <label for="txtEmail">Email</label>
             </div>
           </div>
-          <div class="modal-footer">
-            <asp:Button ID="btnGuardarEdicion" runat="server" CssClass="btn btn-warning" Text="Guardar cambios" OnClick="btnGuardarEdicion_Click" />
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+          <div class="col-12">
+            <div class="form-floating">
+              <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control" placeholder="Dirección" />
+              <label for="txtDireccion">Dirección</label>
+            </div>
           </div>
+
+          <!-- COBERTURA -->
+          <div class="col-12 mt-2">
+            <h6 class="text-uppercase text-muted mb-2">Cobertura</h6>
+            <hr class="mt-0 mb-3" />
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              <asp:TextBox ID="txtObraSocial" runat="server" CssClass="form-control" placeholder="Obra Social" />
+              <label for="txtObraSocial">Obra Social</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              <asp:TextBox ID="txtNroAfiliado" runat="server" CssClass="form-control" placeholder="Nro. Afiliado" />
+              <label for="txtNroAfiliado">Nro. Afiliado</label>
+            </div>
+          </div>
+
         </div>
       </div>
+
+      <div class="modal-footer flex-column flex-sm-row gap-2">
+        <asp:Button ID="btnGuardarAlta" runat="server" CssClass="btn btn-primary px-4" Text="Guardar"
+          OnClick="btnGuardarAlta_Click" ValidationGroup="alta" />
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+      </div>
     </div>
+  </div>
+</div>
+
+   <!-- ================= MODAL EDICIÓN ================= -->
+<div class="modal fade" id="modalEdit" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title">
+          <i class="bi bi-pencil-square me-2"></i> Editar Paciente
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+
+          <div class="col-12">
+            <h6 class="text-uppercase text-muted mb-2">Identificación</h6>
+            <hr class="mt-0 mb-3" />
+          </div>
+
+          <div class="col-md-3">
+            <div class="form-floating">
+              <asp:TextBox ID="txtEditDni" runat="server" CssClass="form-control bg-light text-muted"
+                           ReadOnly="true" placeholder="DNI" />
+              <label for="txtEditDni">DNI</label>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-floating">
+              <asp:TextBox ID="txtEditNombre" runat="server" CssClass="form-control" placeholder="Nombre" />
+              <label for="txtEditNombre">Nombre</label>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <div class="form-floating">
+              <asp:TextBox ID="txtEditApellido" runat="server" CssClass="form-control" placeholder="Apellido" />
+              <label for="txtEditApellido">Apellido</label>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Género</label>
+            <asp:DropDownList ID="ddlEditGenero" runat="server" CssClass="form-select">
+              <asp:ListItem Value="Masculino">Masculino</asp:ListItem>
+              <asp:ListItem Value="Femenino">Femenino</asp:ListItem>
+              <asp:ListItem Value="Otro">Otro</asp:ListItem>
+              <asp:ListItem Value="No informa">No informa</asp:ListItem>
+            </asp:DropDownList>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Fecha de Nacimiento</label>
+            <asp:TextBox ID="txtEditFechaNac" runat="server" CssClass="form-control" TextMode="Date" />
+          </div>
+
+          <div class="col-12 mt-2">
+            <h6 class="text-uppercase text-muted mb-2">Contacto</h6>
+            <hr class="mt-0 mb-3" />
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-floating">
+              <asp:TextBox ID="txtEditTelefono" runat="server" CssClass="form-control" placeholder="Teléfono" />
+              <label for="txtEditTelefono">Teléfono</label>
+            </div>
+          </div>
+
+          <div class="col-md-8">
+            <div class="form-floating">
+              <asp:TextBox ID="txtEditEmail" runat="server" CssClass="form-control" TextMode="Email" placeholder="Email" />
+              <label for="txtEditEmail">Email</label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="form-floating">
+              <asp:TextBox ID="txtEditDireccion" runat="server" CssClass="form-control" placeholder="Dirección" />
+              <label for="txtEditDireccion">Dirección</label>
+            </div>
+          </div>
+
+          <div class="col-12 mt-2">
+            <h6 class="text-uppercase text-muted mb-2">Cobertura</h6>
+            <hr class="mt-0 mb-3" />
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              <asp:TextBox ID="txtEditObraSocial" runat="server" CssClass="form-control" placeholder="Obra Social" />
+              <label for="txtEditObraSocial">Obra Social</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              <asp:TextBox ID="txtEditNroAfiliado" runat="server" CssClass="form-control" placeholder="Nro. Afiliado" />
+              <label for="txtEditNroAfiliado">Nro. Afiliado</label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer flex-column flex-sm-row gap-2">
+        <asp:Button ID="btnGuardarEdicion" runat="server" CssClass="btn btn-warning px-4" Text="Guardar cambios"
+          OnClick="btnGuardarEdicion_Click" />
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <!-- ================= MODAL ELIMINAR ================= -->
     <div class="modal fade" id="modalDelete" tabindex="-1" aria-hidden="true">
@@ -328,11 +409,56 @@
       </div>
     </div>
 
+    <!-- ============== MODAL REGISTRAR INGRESO ============== -->
+<div class="modal fade" id="modalIngreso" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-clipboard-plus me-2"></i> Registrar ingreso a guardia
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="alert alert-info mb-3">
+              <strong>Paciente:</strong> <span id="ingresoPacienteNombre"></span>
+              <span class="ms-3"><strong>DNI:</strong> <span id="ingresoPacienteDni"></span></span>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Descripción / motivo de consulta</label>
+            <asp:TextBox ID="txtDescSintomas" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="4"
+                         placeholder="Escribí lo que te cuenta el paciente..."></asp:TextBox>
+            <small class="text-muted">El sistema calculará el estado (<strong>Espera</strong>) y la prioridad automáticamente. 
+                Los resultados arrojados serán evaluados por un enfermero.</small>
+          </div>
+
+          <div class="col-12 d-flex align-items-center gap-3">
+            <span>Prioridad estimada: </span>
+            <span id="prioridadBadge" class="badge rounded-pill bg-secondary px-3 py-2">–</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer flex-column flex-sm-row gap-2">
+        <asp:Button ID="btnConfirmarIngreso" runat="server" CssClass="btn btn-success px-4"
+                    Text="Confirmar ingreso" OnClick="btnConfirmarIngreso_Click" />
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
       // Helpers para abrir modales con datos
-        function openEditModal(id, dni, nombre, apellido, genero, telefono, email, obra, afiliado, prioridad, estado, fechaNac, Direccion) {
+        function openEditModal(id, dni, nombre, apellido, genero, telefono, email, obra, afiliado, fechaNac, Direccion) {
 
             Direccion = (typeof Direccion === "undefined" || Direccion === null) ? "" : Direccion;
 
@@ -345,8 +471,6 @@
         document.getElementById("<%= txtEditEmail.ClientID %>").value = email;
         document.getElementById("<%= txtEditObraSocial.ClientID %>").value = obra;
         document.getElementById("<%= txtEditNroAfiliado.ClientID %>").value = afiliado;
-        document.getElementById("<%= txtEditPrioridad.ClientID %>").value = prioridad;
-        document.getElementById("<%= txtEditEstado.ClientID %>").value = estado;
         document.getElementById("<%= txtEditFechaNac.ClientID %>").value = fechaNac;
         document.getElementById("<%= txtEditDireccion.ClientID %>").value = Direccion; 
 
@@ -363,6 +487,82 @@
         modal.show();
       }
     </script>
+
+    <script>
+        function safeBack() {
+            if (history.length > 1) history.back();
+            else window.location.href = '<%= ResolveUrl("~/Default.aspx") %>';
+        }
+    </script>
+
+    <script>
+        function soloNumeros(e) {
+            const key = e.key;
+            if (!/^\d$/.test(key)) {
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        }
+    </script>
+
+    <script>
+        // Abrir modal de ingreso con datos del paciente
+        function openIngresoModal(pacienteId, nombreCompleto, dni) {
+            document.getElementById("<%= hfIngresoPacienteId.ClientID %>").value = pacienteId;
+      document.getElementById("ingresoPacienteNombre").innerText = nombreCompleto;
+      document.getElementById("ingresoPacienteDni").innerText = dni;
+
+      // limpiar campos previos
+      document.getElementById("<%= txtDescSintomas.ClientID %>").value = "";
+    setPrioridadPreview(0);
+
+    // escuchar cambios para recalcular prioridad
+    setTimeout(() => {
+      document.getElementById("<%= txtDescSintomas.ClientID %>").oninput = function () {
+        const prioridad = calcularPrioridad(this.value || "");
+        setPrioridadPreview(prioridad);
+        document.getElementById("<%= hfIngresoPrioridad.ClientID %>").value = prioridad;
+        };
+    }, 0);
+
+            new bootstrap.Modal(document.getElementById('modalIngreso')).show();
+        }
+
+        // Heurística simple por palabras clave para calcular prioridad 1..5
+        function calcularPrioridad(texto) {
+            const t = (texto || "").toLowerCase();
+
+            // Palabras/expresiones
+            const p5 = /(inconsciente|no respira|paro|convuls|dolor torácico intenso|sangrado abundante|ahogo|disnea severa|asfix)/;
+            const p4 = /(fiebre alta|trauma craneal|dolor muy fuerte|fractura|hemorragia|vómitos persistentes|desmayo|dolor pecho|arritmia)/;
+            const p3 = /(mareo|dolor moderado|vomito|diarrea|infección|caída|hipertensión|hipotensión|deshidratación)/;
+            const p2 = /(dolor leve|control|consulta|tos|resfriado|dolor garganta|dolor de espalda leve|medicación)/;
+
+            if (p5.test(t)) return 5;
+            if (p4.test(t)) return 4;
+            if (p3.test(t)) return 3;
+            if (p2.test(t)) return 2;
+            return 1; // por defecto
+
+            /*
+                p1 --> Verde
+                p2 --> Verde
+                p3 --> Amarillo
+                p4 --> Amarillo
+                p5 --> Rojo
+            */ 
+        }
+
+        // Mostrar badge con color según prioridad
+        function setPrioridadPreview(n) {
+            const badge = document.getElementById("prioridadBadge");
+            const clases = ["bg-secondary", "bg-success", "bg-success", "bg-warning", "bg-warning", "bg-danger"];
+            badge.className = "badge rounded-pill px-3 py-2 " + (clases[n] || "bg-secondary");
+            badge.innerText = n > 0 ? ("P" + n) : "–";
+        }
+    </script>
+
 </form>
 </body>
 </html>
