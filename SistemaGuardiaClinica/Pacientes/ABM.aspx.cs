@@ -247,7 +247,6 @@ namespace SistemaGuardiaClinica.Pacientes
             }
             return sb.ToString();
         }
-        // ================= Metodo para confirmar ingreso =================
 
         protected void btnConfirmarIngreso_Click(object sender, EventArgs e)
         {

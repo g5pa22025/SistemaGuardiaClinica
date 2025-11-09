@@ -6,7 +6,7 @@
     <edmx:Diagrams>
       <Diagram DiagramId="88e14c616acf4dd495f7f910e13cc153" Name="Diagram1">
         <EntityTypeShape EntityType="GuardiaClinicaDBModel.Guardias" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="GuardiaClinicaDBModel.Pacientes" Width="1.5" PointX="2.125" PointY="6.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="GuardiaClinicaDBModel.Pacientes" Width="1.5" PointX="3" PointY="6.375" IsExpanded="true" />
         <EntityTypeShape EntityType="GuardiaClinicaDBModel.Roles" Width="1.5" PointX="0.75" PointY="2.25" IsExpanded="true" />
         <EntityTypeShape EntityType="GuardiaClinicaDBModel.sysdiagrams" Width="1.5" PointX="5.75" PointY="6.75" IsExpanded="true" />
         <EntityTypeShape EntityType="GuardiaClinicaDBModel.Usuarios" Width="1.5" PointX="3" PointY="1.375" IsExpanded="true" />
