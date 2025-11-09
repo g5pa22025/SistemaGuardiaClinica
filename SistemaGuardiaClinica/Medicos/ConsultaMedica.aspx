@@ -46,8 +46,8 @@
             <ItemTemplate>
                 <tr class='<%# GetRowClass((int?)Eval("PrioridadFinal")) %>'>
                     <td><%# Eval("FechaIngreso", "{0:dd/MM/yyyy HH:mm}") %></td>
-                    <td><%# Eval("Pacientes.DNI") %></td>
-                    <td><%# Eval("Pacientes.Apellido") %>, <%# Eval("Pacientes.Nombre") %></td>
+                    <td><%# Eval("Paciente.DNI") %></td>
+                    <td><%# Eval("Paciente.Apellido") %>, <%# Eval("Paciente.Nombre") %></td>
                     <td class="text-muted"><%# Eval("Sintomas") %></td>
                     <td>
                         <asp:Literal runat="server" Mode="PassThrough"
@@ -55,9 +55,9 @@
                     </td>
                     <td class="text-end">
                         <button type="button" class="btn btn-sm btn-primary"
-                            onclick='openConsultaModal(
+                           onclick='openConsultaModal(
                                 "<%# Eval("Id") %>",
-                                "<%# (Eval("Pacientes.Apellido") + ", " + Eval("Pacientes.Nombre")).ToString().Replace("\"","\\\"") %>"
+                                "<%# (Eval("Paciente.Apellido") + ", " + Eval("Paciente.Nombre")).ToString().Replace("\"","\\\"") %>"
                             )'>
                             <i class="bi bi-play-circle me-1"></i> Iniciar Consulta
                         </button>
