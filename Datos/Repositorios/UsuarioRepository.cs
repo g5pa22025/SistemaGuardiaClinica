@@ -27,5 +27,26 @@ namespace Datos.Repositorios
                 .Where(u => u.RolId == 3 && u.Especialidad == especialidad && u.Activo)
                 .ToList();
         }
+
+        // Traer todos los médicos activos
+        public List<Usuario> ObtenerMedicos()
+        {
+            return _context.Usuarios
+                .Where(u => u.RolId == 3 && u.Activo)   // RolId = 3 -> Médicos
+                .OrderBy(u => u.Apellido)
+                .ThenBy(u => u.Nombre)
+                .ToList();
+        }
+
+        public List<string> ObtenerEspecialidadesMedicas()
+        {
+            return _context.Usuarios
+                .Where(u => u.RolId == 3 && u.Activo && u.Especialidad != null && u.Especialidad != "")
+                .Select(u => u.Especialidad)
+                .Distinct()
+                .OrderBy(e => e)
+                .ToList();
+        }
+
     }
 }

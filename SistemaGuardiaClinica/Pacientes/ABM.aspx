@@ -15,6 +15,7 @@
         .action-buttons .btn { min-width: 40px; }
         .modal .form-label { font-weight: 600; }
         .sticky-toolbar { position: sticky; top: 0; background: #f6f8fb; z-index: 2; padding-top: .5rem; }
+        .bg-orange { background-color: #fd7e14 !important; }
     </style>
 
     <div class="container py-4">
@@ -487,6 +488,7 @@
     </script>
 
     <script>
+        //Validación de DNI (Solo nros)
         function soloNumeros(e) {
             const key = e.key;
             if (!/^\d$/.test(key)) {
@@ -508,7 +510,7 @@
             document.getElementById("<%= txtDescSintomas.ClientID %>").value = "";
             setPrioridadPreview(0);
 
-            // escuchar cambios para recalcular prioridad
+            // escuchar cambios para recalcular prioridad (Enfermero)
             setTimeout(() => {
               document.getElementById("<%= txtDescSintomas.ClientID %>").oninput = function () {
                 const prioridad = calcularPrioridad(this.value || "");
@@ -520,38 +522,53 @@
             new bootstrap.Modal(document.getElementById('modalIngreso')).show();
         }
 
-        // Heurística simple por palabras clave para calcular prioridad 1..5
+        // Heurística por palabras clave para calcular prioridad 1..5
         function calcularPrioridad(texto) {
             const t = (texto || "").toLowerCase();
 
-            // Palabras/expresiones
-            const p5 = /(inconsciente|no respira|paro|convuls|dolor torácico intenso|sangrado abundante|ahogo|disnea severa|asfix)/;
-            const p4 = /(fiebre alta|trauma craneal|dolor muy fuerte|fractura|hemorragia|vómitos persistentes|desmayo|dolor pecho|arritmia)/;
-            const p3 = /(mareo|dolor moderado|vomito|diarrea|infección|caída|hipertensión|hipotensión|deshidratación)/;
-            const p2 = /(dolor leve|control|consulta|tos|resfriado|dolor garganta|dolor de espalda leve|medicación)/;
+            // P1: Rojo - Emergencia, atención inmediata
+            const p1 = /(inconsciente|no respira|paro( cardiaco| cardiorrespiratorio)?|parada cardiaca|convuls(ion|iones)?|ataque epileptico|no responde|perdida de conocimiento|perdió el conocimiento|dolor (toracico|de pecho) intenso|dolor de pecho muy fuerte|opresion intensa en el pecho|sangrado (abundante|masivo|profuso)|mucha sangre|herida que no (para|deja) de sangrar|ahogo|ahogamiento|disnea severa|dificultad extrema para respirar|asfix(ia)?|labios morados|piel morada)/;
 
-            if (p5.test(t)) return 5;
-            if (p4.test(t)) return 4;
-            if (p3.test(t)) return 3;
-            if (p2.test(t)) return 2;
-            return 1; // por defecto
+            // P2: Naranja - Muy urgente
+            const p2 = /(fiebre (alta|muy alta|mas de 38|más de 38|> ?38)|temperatura (alta|39|40)|39.?c|40.?c|trauma craneal|golpe fuerte en la cabeza|golpe en la cabeza y mareos|dolor muy fuerte|dolor intenso|dolor insoportable|fractura|posible fractura|hemorragia|vomitos persistentes|vómitos persistentes|vomito con sangre|vómito con sangre|desmayo|se desmayo|se desmayó|perdida breve de conciencia|dolor en el pecho|dolor de pecho|palpitaciones fuertes|arritmia|dificultad importante para respirar|crisis asmatica|crisis asmática|ataque de asma)/;
+
+            // P3: Amarillo - Urgente
+            const p3 = /(mareo|mareos|sensacion de inestabilidad|sensación de inestabilidad|dolor moderado|dolor soportable|vomito|vómito|diarrea|gastroenteritis|infeccion|infección|herida|corte|esguince|torcedura|golpe|caida|caída|hipertension|hipertensión|presion alta|presión alta|tension alta|tensión alta|hipotension|hipotensión|presion baja|presión baja|tension baja|tensión baja|deshidratacion|deshidratación|malestar general|malestar corporal|dolor de cabeza fuerte pero tolerable)/;
+
+            // P4: Verde - Menos urgente
+            const p4 = /(dolor leve|molestia leve|molestia|control|consulta de rutina|control de rutina|chequeo|chequeo general|tos|resfriado|resfrio|gripe|catarro|dolor de garganta|dolor garganta|dolor de espalda leve|lumbalgia leve|medicacion|medicación|renovar receta|receta|curacion de herida|curación de herida|curacion|curación|sacar puntos|retirar puntos|quitar puntos|cambio de vendaje)/;
+
+            if (p1.test(t)) return 1; // Rojo
+            if (p2.test(t)) return 2; // Naranja
+            if (p3.test(t)) return 3; // Amarillo
+            if (p4.test(t)) return 4; // Verde
+            return 5;                 // Azul (no urgente, por defecto)
 
             /*
-                p1 --> Verde
-                p2 --> Verde
-                p3 --> Amarillo
-                p4 --> Amarillo
-                p5 --> Rojo
+                p1 --> Rojo (Inmediato) --> Riesgo vital inminente
+                p2 --> Naranja (Muy urgente) --> Urgencia que puede deteriorarse rapidamente
+                p3 --> Amarillo (Urgente) --> Urgencia aguda, no amenazante de la vida
+                p4 --> Verde (Menos urgente) --> Condición que no pone en riesgo la vida
+                p5 --> Azul (No urgente) --> Paciente sin urgencia clinica
             */
         }
 
         // Mostrar badge con color según prioridad
         function setPrioridadPreview(n) {
             const badge = document.getElementById("prioridadBadge");
-            const clases = ["bg-secondary", "bg-success", "bg-success", "bg-warning", "bg-warning", "bg-danger"];
+            const clases = [
+                "bg-secondary", // 0 (sin prioridad)
+                "bg-danger",    // P1 - Rojo
+                "bg-orange",    // P2 - Naranja
+                "bg-warning",   // P3 - Amarillo
+                "bg-success",   // P4 - Verde
+                "bg-primary"    // P5 - Azul
+            ];
+
             badge.className = "badge rounded-pill px-3 py-2 " + (clases[n] || "bg-secondary");
             badge.innerText = n > 0 ? ("P" + n) : "–";
         }
+
     </script>
 
 </asp:Content>
