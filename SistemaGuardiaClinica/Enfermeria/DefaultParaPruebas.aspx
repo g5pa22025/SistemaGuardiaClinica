@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" 
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="DefaultParaPruebas.aspx.cs" 
     Inherits="SistemaGuardiaClinica.Enfermeria.Default" %>
 
 <!DOCTYPE html>
