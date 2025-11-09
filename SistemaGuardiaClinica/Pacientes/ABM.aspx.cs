@@ -98,7 +98,7 @@ namespace SistemaGuardiaClinica.Pacientes
                     NumeroAfiliado = (txtNroAfiliado.Text ?? "").Trim(),
                     Genero = ddlGenero.SelectedValue,
                     FechaNacimiento = fechaNac,
-                    Prioridad = 1 //Lo seteo por defecto en 1 
+                    Prioridad = 5 //Lo seteo por defecto en 5. No urgente (Azul)
                 };
 
                 using (var ctx = new ClinicaContext())

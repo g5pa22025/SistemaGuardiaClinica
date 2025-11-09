@@ -46,5 +46,18 @@ namespace Entidades
 
         [Range(1, 5)]
         public int? PrioridadFinal { get; set; }
+
+        // 🔹 Nuevos campos de triaje
+        public decimal? Temperatura { get; set; }          // °C
+        public int? FrecuenciaCardiaca { get; set; }       // lpm
+        public int? FrecuenciaRespiratoria { get; set; }   // rpm
+        public int? PresionSistolica { get; set; }         // mmHg
+        public int? PresionDiastolica { get; set; }        // mmHg
+        public int? SaturacionOxigeno { get; set; }        // %
+        public int? Glucemia { get; set; }                 // mg/dL
+        public int? Glasgow { get; set; }                  // /15
+
+        // Color de triage tipo “Rojo/Naranja/Amarillo/Verde/Azul”
+        public string NivelUrgenciaColor { get; set; }
     }
 }

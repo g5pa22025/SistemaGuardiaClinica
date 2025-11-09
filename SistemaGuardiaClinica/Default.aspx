@@ -57,12 +57,6 @@
                     <i class="bi bi-activity"></i>
                     <span>Triage / Signos Vitales</span>
                 </a>
-
-                <a runat="server" href="~/Guardia/Derivacion.aspx"
-                   class="btn btn-outline-warning d-flex align-items-center gap-2 px-3">
-                    <i class="bi bi-arrow-left-right"></i>
-                    <span>Derivación a Médico</span>
-                </a>
             </div>
         </div>
     </div>

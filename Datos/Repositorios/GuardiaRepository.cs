@@ -40,23 +40,26 @@ namespace Datos.Repositorios
                 .FirstOrDefault(g => g.Id == id);
         }
 
+        // Los más críticos aparezcan primero.
         public List<Guardia> ObtenerPorEstado(string estado)
         {
             return _context.Guardias
-                .Include(g => g.Paciente)
-                .Where(g => g.Estado == estado)
-                .OrderByDescending(g => g.PrioridadFinal)
-                .ThenBy(g => g.FechaIngreso)
-                .ToList();
+            .Include(g => g.Paciente)
+            .Where(g => g.Estado == estado)
+            .OrderBy(g => g.PrioridadFinal ?? int.MaxValue)   // 1 primero
+            .ThenBy(g => g.FechaIngreso)
+            .ToList();
         }
 
+        // Los más críticos aparezcan primero.
         public List<Guardia> ObtenerPorMedico(int medicoId)
         {
             return _context.Guardias
-                .Include(g => g.Paciente)
-                .Where(g => g.MedicoId == medicoId && g.Estado == "Atencion")
-                .OrderByDescending(g => g.PrioridadFinal)
-                .ToList();
+            .Include(g => g.Paciente)
+            .Where(g => g.MedicoId == medicoId && g.Estado == "Atencion")
+            .OrderBy(g => g.PrioridadFinal ?? int.MaxValue)
+            .ThenBy(g => g.FechaIngreso)
+            .ToList();
         }
 
         public Guardia ObtenerPorPaciente(int pacienteId)
