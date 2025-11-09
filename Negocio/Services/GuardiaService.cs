@@ -51,7 +51,7 @@ namespace Negocio.Services
             if (guardia != null)
             {
                 guardia.MedicoId = medicoId;
-                guardia.Estado = "Atencion";
+                guardia.Estado = "Triaje";
 
                 _repository.Actualizar(guardia);
             }
