@@ -11,34 +11,52 @@ namespace SistemaGuardiaClinica.Medicos
 {
 
 
-    public partial class Default
+    public partial class ConsultaMedica
     {
 
         /// <summary>
-        /// Control lblUsuario.
+        /// Control phMsg.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblUsuario;
+        protected global::System.Web.UI.WebControls.PlaceHolder phMsg;
 
         /// <summary>
-        /// Control lblRol.
+        /// Control rpTriageados.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblRol;
+        protected global::System.Web.UI.WebControls.Repeater rpTriageados;
 
         /// <summary>
-        /// Control lblEspecialidad.
+        /// Control hfConsultaGuardiaId.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblEspecialidad;
+        protected global::System.Web.UI.WebControls.HiddenField hfConsultaGuardiaId;
+
+        /// <summary>
+        /// Control txtConsultaNotas.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtConsultaNotas;
+
+        /// <summary>
+        /// Control btnFinalizarConsulta.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnFinalizarConsulta;
     }
 }

@@ -81,13 +81,13 @@
             </p>
 
             <div class="d-flex flex-wrap gap-3">
-                <a runat="server" href="~/Medico/Atencion.aspx"
+                <a runat="server" href="~/Medicos/ConsultaMedica.aspx"
                    class="btn btn-outline-warning d-flex align-items-center gap-2 px-3">
                     <i class="bi bi-clipboard2-pulse"></i>
                     <span>Atender Paciente</span>
                 </a>
 
-                <a runat="server" href="~/Medico/HistoriaClinica.aspx"
+                <a runat="server" href="~/Medicos/HistoriaClinica.aspx"
                    class="btn btn-outline-primary d-flex align-items-center gap-2 px-3">
                     <i class="bi bi-journal-medical"></i>
                     <span>Historia Clínica</span>
