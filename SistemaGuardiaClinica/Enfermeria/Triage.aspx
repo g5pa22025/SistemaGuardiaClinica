@@ -9,27 +9,54 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 
     <style>
-        body { background: #f6f8fb; }
-        .card { border-radius: 1rem; }
-        .table td, .table th { vertical-align: middle; }
-        .row-pr-1 { --bs-table-bg: #fdecea; } /* Rojo suave - P1 (Inmediato) */
-        .row-pr-2 { --bs-table-bg: #fff3cd; } /* Naranja suave - P2 (Muy urgente) */
-        .row-pr-3 { --bs-table-bg: #fff7e6; } /* Amarillo suave - P3 (Urgente) */
-        .row-pr-4 { --bs-table-bg: #edf7ee; } /* Verde suave - P4 (Menos urgente) */
-        .row-pr-5 { --bs-table-bg: #e7f1ff; } /* Azul suave - P5 (No urgente) */
-        .bg-prio-orange { background-color: #fd7e14 !important; } /* Naranja Bootstrap-like */
+        body {
+            background: #f6f8fb;
+        }
+
+        .card {
+            border-radius: 1rem;
+        }
+
+        .table td, .table th {
+            vertical-align: middle;
+        }
+
+        .row-pr-1 {
+            --bs-table-bg: #fdecea;
+        }
+        /* Rojo suave - P1 (Inmediato) */
+        .row-pr-2 {
+            --bs-table-bg: #fff3cd;
+        }
+        /* Naranja suave - P2 (Muy urgente) */
+        .row-pr-3 {
+            --bs-table-bg: #fff7e6;
+        }
+        /* Amarillo suave - P3 (Urgente) */
+        .row-pr-4 {
+            --bs-table-bg: #edf7ee;
+        }
+        /* Verde suave - P4 (Menos urgente) */
+        .row-pr-5 {
+            --bs-table-bg: #e7f1ff;
+        }
+        /* Azul suave - P5 (No urgente) */
+        .bg-prio-orange {
+            background-color: #fd7e14 !important;
+        }
+        /* Naranja Bootstrap-like */
     </style>
 
     <div class="container py-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h4 class="mb-0">
-                <i class="bi bi-clipboard-pulse me-2"></i> Pacientes en espera
+                <i class="bi bi-clipboard-pulse me-2"></i>Pacientes en espera
             </h4>
         </div>
 
         <asp:PlaceHolder ID="phMsg" runat="server"></asp:PlaceHolder>
 
-        <asp:Repeater ID="rpEspera" runat="server">
+        <asp:Repeater ID="rpEspera" runat="server" OnItemDataBound="rpEspera_ItemDataBound">
             <HeaderTemplate>
                 <div class="card shadow-sm">
                     <div class="table-responsive">
@@ -42,7 +69,7 @@
                                     <th>Síntomas</th>
                                     <th style="width: 130px;">Prioridad</th>
                                     <th style="width: 290px;"><%= new string('\n', 20).Replace("\n", "&nbsp;") %>Acciones</th>
-                                 </tr>
+                                </tr>
                             </thead>
                             <tbody>
             </HeaderTemplate>
@@ -55,18 +82,18 @@
                     <td class="text-muted"><%# Eval("Sintomas") %></td>
                     <td>
                         <asp:Literal runat="server" Mode="PassThrough"
-                                     Text='<%# GetBadge((int?)Eval("PrioridadFinal")) %>' />
+                            Text='<%# GetBadge((int?)Eval("PrioridadFinal")) %>' />
                     </td>
                     <td class="text-end align-middle">
-                    <!-- Abrir Triage -->
-                    <a runat="server"
-                        href='<%# ResolveUrl("~/Enfermeria/TriageDetalle.aspx?id=" + Eval("Id")) %>'
-                        class="btn btn-sm btn-primary me-2"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Comenzar Triaje">
-                        <i class="bi bi-box-arrow-up-right me-1"></i> Abrir Triage
-                    </a>
+                        <!-- Abrir Triage -->
+                        <a runat="server"
+                            href='<%# ResolveUrl("~/Enfermeria/TriageDetalle.aspx?id=" + Eval("Id")) %>'
+                            class="btn btn-sm btn-primary me-2"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Comenzar Triaje">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>Abrir Triage
+                        </a>
 
                         <!-- Info (modal) -->
                         <button type="button"
@@ -81,11 +108,15 @@
                             data-prioridad='<%# (Eval("PrioridadFinal") ?? 0) %>'
                             data-color='<%# (Eval("NivelUrgenciaColor") ?? "").ToString() %>'
                             data-especialidad='<%# (Eval("EspecialidadRequerida") ?? "").ToString().Replace("\"","\\\"") %>'
-                            data-obs='<%# (Eval("ObservacionesEnfermero") ?? "").ToString().Replace("\"","\\\"") %>'>
-                            <i class="bi bi-info-circle me-1"></i> Info
+                            data-obs='<%# (Eval("ObservacionesEnfermero") ?? "").ToString().Replace("\"","\\\"") %>'
+                            style='<%# MostrarInfo(Eval("EnfermeroId"),
+                               Eval("NivelUrgenciaColor"),
+                               Eval("ObservacionesEnfermero"))
+                ? "": "display:none;" %>'>
+                            <i class="bi bi-info-circle me-1"></i>Info
                         </button>
 
-                       <!-- Editar síntomas/prioridad: abre modal -->
+                        <!-- Editar síntomas/prioridad: abre modal -->
                         <button type="button"
                             class="btn btn-sm btn-outline-secondary"
                             title="Editar síntomas y prioridad"
@@ -95,7 +126,7 @@
                                 "<%# (Eval("Sintomas") ?? "").ToString() %>",
                                 "<%# (Eval("PrioridadFinal") ?? 1) %>"
                             )'>
-                            <i class="bi bi-pencil-square me-1"></i> Editar
+                            <i class="bi bi-pencil-square me-1"></i>Editar
                         </button>
                         </div>
                     </td>
@@ -104,7 +135,7 @@
             </ItemTemplate>
 
             <FooterTemplate>
-                            </tbody>
+                </tbody>
                         </table>
                     </div>
                 </div>
@@ -118,112 +149,114 @@
 
     <!-- MODAL editar síntomas/prioridad -->
     <div class="modal fade" id="modalEdit" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header bg-secondary text-white">
-            <h5 class="modal-title">
-              <i class="bi bi-pencil-square me-2"></i> Editar síntomas y prioridad
-            </h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil-square me-2"></i>Editar síntomas y prioridad
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
 
-          <div class="modal-body">
-            <div class="alert alert-info">
-              <strong>Paciente:</strong> <span id="editPacienteNombre"></span>
-            </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <strong>Paciente:</strong> <span id="editPacienteNombre"></span>
+                    </div>
 
-            <div class="mb-3">
-              <label class="form-label">¿Cambió algo en sus síntomas?</label>
-              <div class="form-text">Si cambió, actualizá la descripción. Si no, podés confirmar sin cambios.</div>
-            </div>
+                    <div class="mb-3">
+                        <label class="form-label">¿Cambió algo en sus síntomas?</label>
+                        <div class="form-text">Si cambió, actualizá la descripción. Si no, podés confirmar sin cambios.</div>
+                    </div>
 
-            <div class="mb-3">
-              <label class="form-label">Síntomas / descripción</label>
-              <asp:TextBox ID="txtEditSintomas" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="4"
-                           placeholder="Escribí lo que te cuenta el paciente..."></asp:TextBox>
-            </div>
+                    <div class="mb-3">
+                        <label class="form-label">Síntomas / descripción</label>
+                        <asp:TextBox ID="txtEditSintomas" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="4"
+                            placeholder="Escribí lo que te cuenta el paciente..."></asp:TextBox>
+                    </div>
 
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Prioridad</label>
-                <asp:DropDownList ID="ddlEditPrioridad" runat="server" CssClass="form-select"
-                  onchange="onPriorityChange(this.value)">
-                    <asp:ListItem Value="1">P1 (Inmediato)</asp:ListItem>
-                    <asp:ListItem Value="2">P2 (Muy urgente)</asp:ListItem>
-                    <asp:ListItem Value="3">P3 (Urgente)</asp:ListItem>
-                    <asp:ListItem Value="4">P4 (Menos urgente)</asp:ListItem>
-                    <asp:ListItem Value="5">P5 (No urgente)</asp:ListItem>
-                </asp:DropDownList>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Prioridad</label>
+                            <asp:DropDownList ID="ddlEditPrioridad" runat="server" CssClass="form-select"
+                                onchange="onPriorityChange(this.value)">
+                                <asp:ListItem Value="1">P1 (Inmediato)</asp:ListItem>
+                                <asp:ListItem Value="2">P2 (Muy urgente)</asp:ListItem>
+                                <asp:ListItem Value="3">P3 (Urgente)</asp:ListItem>
+                                <asp:ListItem Value="4">P4 (Menos urgente)</asp:ListItem>
+                                <asp:ListItem Value="5">P5 (No urgente)</asp:ListItem>
+                            </asp:DropDownList>
 
-              </div>
-              <div class="col-md-6 d-flex align-items-end">
-                <span>Vista previa:&nbsp;</span>
-                <span id="prioPreview" class="badge rounded-pill bg-secondary px-3 py-2">–</span>
-              </div>
-            </div>
-          </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <span>Vista previa:&nbsp;</span>
+                            <span id="prioPreview" class="badge rounded-pill bg-secondary px-3 py-2">–</span>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="modal-footer flex-column flex-sm-row gap-2">
-            <asp:Button ID="btnGuardarEdicion" runat="server" CssClass="btn btn-secondary px-4"
+                <div class="modal-footer flex-column flex-sm-row gap-2">
+                    <asp:Button ID="btnGuardarEdicion" runat="server" CssClass="btn btn-secondary px-4"
                         Text="Guardar cambios" OnClick="btnGuardarEdicion_Click" />
-            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-          </div>
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- MODAL INFO TRIAGE -->
-<div class="modal fade" id="modalInfoTriage" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header bg-info text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-info-circle me-2"></i> Resumen de triage
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
+    <div class="modal fade" id="modalInfoTriage" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-info-circle me-2"></i>Resumen de triage
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
 
-      <div class="modal-body">
-        <div class="mb-3">
-          <strong>Paciente:</strong> <span id="infoPaciente"></span><br />
-          <strong>DNI:</strong> <span id="infoDni"></span><br />
-          <strong>Fecha ingreso:</strong> <span id="infoFecha"></span>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Paciente:</strong> <span id="infoPaciente"></span>
+                        <br />
+                        <strong>DNI:</strong> <span id="infoDni"></span>
+                        <br />
+                        <strong>Fecha ingreso:</strong> <span id="infoFecha"></span>
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <strong>Síntomas iniciales:</strong>
+                        <p class="mb-0" id="infoSintomas"></p>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <strong>Prioridad final:</strong>
+                            <span id="infoPrioridad" class="badge rounded-pill bg-secondary ms-1"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Color / nivel:</strong>
+                            <span id="infoColor"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Especialidad requerida:</strong>
+                            <span id="infoEspecialidad"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Observaciones de enfermería:</strong>
+                        <p class="mb-0" id="infoObs"></p>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
         </div>
-
-        <hr />
-
-        <div class="mb-3">
-          <strong>Síntomas iniciales:</strong>
-          <p class="mb-0" id="infoSintomas"></p>
-        </div>
-
-        <div class="row g-3 mb-3">
-          <div class="col-md-4">
-            <strong>Prioridad final:</strong>
-            <span id="infoPrioridad" class="badge rounded-pill bg-secondary ms-1"></span>
-          </div>
-          <div class="col-md-4">
-            <strong>Color / nivel:</strong>
-            <span id="infoColor"></span>
-          </div>
-          <div class="col-md-4">
-            <strong>Especialidad requerida:</strong>
-            <span id="infoEspecialidad"></span>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <strong>Observaciones de enfermería:</strong>
-          <p class="mb-0" id="infoObs"></p>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
     </div>
-  </div>
-</div>
 
     <!-- Scripts propios de esta página (Bootstrap JS ya viene del master) -->
     <script>

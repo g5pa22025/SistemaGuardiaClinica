@@ -1,7 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Entidades;
+﻿using Datos;
 using Datos.Repositorios;
+using Entidades;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data.Entity;   // Para Include
 
 namespace Negocio.Services
 {
@@ -51,23 +54,25 @@ namespace Negocio.Services
             if (guardia != null)
             {
                 guardia.MedicoId = medicoId;
-                guardia.Estado = "Triaje";
+                guardia.Estado = "Triaje";  // o "En consulta" 
 
                 _repository.Actualizar(guardia);
             }
         }
 
-        public void FinalizarAtencion(int guardiaId, string diagnostico, string medicamentos)
+        // Finaliza la atención médica, dejando Estado = "Atendido".
+        public void FinalizarAtencion(int guardiaId, int medicoId, string diagnostico, string medicamentos)
         {
-            var guardia = _repository.ObtenerPorId(guardiaId);
-            if (guardia != null)
-            {
-                guardia.DiagnosticoMedico = diagnostico;
-                guardia.Medicamentos = medicamentos;
-                guardia.Estado = "Finalizado";
+            var g = _repository.ObtenerPorId(guardiaId);
+            if (g == null)
+                throw new Exception("Guardia no encontrada.");
 
-                _repository.Actualizar(guardia);
-            }
+            g.DiagnosticoMedico = diagnostico;
+            g.Medicamentos = medicamentos;
+            g.MedicoId = medicoId;
+            g.Estado = "Atendido";
+
+            _repository.Actualizar(g);
         }
 
         public List<Guardia> ObtenerPacientesEnEspera()
@@ -75,9 +80,41 @@ namespace Negocio.Services
             return _repository.ObtenerPorEstado("Espera");
         }
 
-        public List<Guardia> ObtenerPacientesEnTriaje()
+        /// <summary>
+        /// Pacientes triageados (y también atendidos, para que sigan visibles).
+        /// </summary>
+        public IList<Guardia> ObtenerPacientesEnTriaje()
         {
-            return _repository.ObtenerPorEstado("Triaje");
+            using (var ctx = new ClinicaContext())
+            {
+                return ctx.Guardias
+                    .Include(g => g.Paciente)
+                    .Where(g => g.Estado == "Triaje" || g.Estado == "Atendido")
+                    .OrderBy(g => g.PrioridadFinal)
+                    .ThenBy(g => g.FechaIngreso)
+                    .ToList();
+            }
+        }
+
+        public IList<Guardia> ObtenerPacientesEnTriajePorEspecialidad(string especialidadRequerida, int? medicoId = null)
+        {
+            using (var ctx = new ClinicaContext())
+            {
+                var q = ctx.Guardias
+                    .Include("Paciente")
+                    .Where(g => g.Estado == "Triaje" || g.Estado == "Atendido");
+
+                if (!string.IsNullOrWhiteSpace(especialidadRequerida))
+                    q = q.Where(g => g.EspecialidadRequerida == especialidadRequerida);
+
+                if (medicoId.HasValue && medicoId.Value > 0)
+                    q = q.Where(g => g.MedicoId == null || g.MedicoId == medicoId.Value);
+
+                return q
+                    .OrderBy(g => g.PrioridadFinal)
+                    .ThenBy(g => g.FechaIngreso)
+                    .ToList();
+            }
         }
 
         public List<Guardia> ObtenerPacientesPorMedico(int medicoId)

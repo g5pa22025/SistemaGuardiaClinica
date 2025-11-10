@@ -169,5 +169,19 @@ namespace SistemaGuardiaClinica.Enfermeria
             return !string.IsNullOrWhiteSpace(s);
         }
 
+        public bool MostrarInfo(object enfermeroId, object nivelUrgenciaColor, object observaciones)
+        {
+            // Enfermero asignado
+            bool tieneEnfermero = enfermeroId != null && enfermeroId != DBNull.Value;
+
+            // Color / nivel asignado en el triage
+            bool tieneColor = !string.IsNullOrWhiteSpace(Convert.ToString(nivelUrgenciaColor));
+
+            // Observaciones de enfermería
+            bool tieneObs = !string.IsNullOrWhiteSpace(Convert.ToString(observaciones));
+
+            // Solo mostramos Info si hay trabajo de enfermería
+            return tieneEnfermero || tieneColor || tieneObs;
+        }
     }
 }

@@ -408,8 +408,9 @@
                                 CssClass="text-danger"
                                 Display="Dynamic"
                                 ValidationGroup="alta"
-                                ErrorMessage="Máximo 10 caracteres alfanuméricos."
-                                ValidationExpression="^[A-Za-z0-9]{1,10}$" />
+                                ErrorMessage="Máximo 10 caracteres alfanuméricos (o SIN COBERTURA)."
+                                ValidationExpression="^(SIN COBERTURA|[A-Za-z0-9]{1,10})$" />
+
                         </div>
 
 
@@ -652,8 +653,9 @@
                                 CssClass="text-danger"
                                 Display="Dynamic"
                                 ValidationGroup="edit"
-                                ErrorMessage="Máximo 10 caracteres alfanuméricos."
-                                ValidationExpression="^[A-Za-z0-9]{1,10}$" />
+                                ErrorMessage="Máximo 10 caracteres alfanuméricos (o SIN COBERTURA)."
+                                ValidationExpression="^(SIN COBERTURA|[A-Za-z0-9]{1,10})$" />
+
                         </div>
 
 
@@ -761,6 +763,13 @@
             document.getElementById("<%= txtEditFechaNac.ClientID %>").value = fechaNac;
             document.getElementById("<%= txtEditDireccion.ClientID %>").value = Direccion;
 
+            // Ajustar el estado del afiliado según la obra social actual
+            actualizarAfiliado(
+        "<%= ddlEditObraSocial.ClientID %>",
+        "<%= txtEditNroAfiliado.ClientID %>"
+            );
+
+
             var modal = new bootstrap.Modal(document.getElementById('modalEdit'));
             modal.show();
         }
@@ -775,10 +784,31 @@
         }
     </script>
 
+
+    <%--Función de btn volver--%>
     <script>
         function safeBack() {
-            if (history.length > 1) history.back();
-            else window.location.href = '<%= ResolveUrl("~/Default.aspx") %>';
+            // Página por defecto si no hay referrer o viene de otro sitio
+            var fallbackUrl = '<%= ResolveUrl("~/Default.aspx") %>';
+
+            // Referrer = página anterior (solo si es del mismo sitio)
+            var ref = document.referrer;
+
+            try {
+                if (ref) {
+                    var refUrl = new URL(ref);
+                    // Solo usamos el referrer si es del mismo origen (misma app)
+                    if (refUrl.origin === window.location.origin) {
+                        window.location.href = ref;
+                        return;
+                    }
+                }
+            } catch (e) {
+                // Si falla el parseo del URL, ignoramos y usamos fallback
+            }
+
+            // Si no hay referrer útil, vamos a la página por defecto
+            window.location.href = fallbackUrl;
         }
     </script>
 
@@ -863,6 +893,56 @@
             badge.className = "badge rounded-pill px-3 py-2 " + (clases[n] || "bg-secondary");
             badge.innerText = n > 0 ? ("P" + n) : "–";
         }
+
+        // Limpia el afiliado cuando está editable (lo que ya usabas en oninput)
+        function limpiarAfiliado(input) {
+            if (input.readOnly) return; // si está bloqueado no toco el valor
+            input.value = input.value.replace(/[^a-zA-Z0-9]/g, "").substring(0, 10);
+        }
+
+        // Activa / desactiva el textbox de afiliado según la Obra Social
+        function actualizarAfiliado(obraClientId, afiliadoClientId) {
+            var ddl = document.getElementById(obraClientId);
+            var txt = document.getElementById(afiliadoClientId);
+            if (!ddl || !txt) return;
+
+            if (ddl.value === "SIN COBERTURA") {
+                // Bloqueado, gris, con texto informativo
+                txt.readOnly = true;
+                txt.classList.add("bg-light", "text-muted");
+                txt.value = "SIN COBERTURA";
+            } else {
+                // Habilitado de nuevo
+                var estabaSinCobertura = (txt.value === "SIN COBERTURA");
+                txt.readOnly = false;
+                txt.classList.remove("bg-light", "text-muted");
+                if (estabaSinCobertura) txt.value = ""; // limpio si venía de SIN COBERTURA
+            }
+        }
+
+        // Cuando la página está lista, engancho los eventos y ajusto el estado inicial
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Alta
+            var ddlAlta = document.getElementById("<%= ddlObraSocial.ClientID %>");
+            var txtAlta = document.getElementById("<%= txtNroAfiliado.ClientID %>");
+            if (ddlAlta && txtAlta) {
+                actualizarAfiliado(ddlAlta.id, txtAlta.id);
+                ddlAlta.addEventListener("change", function () {
+                    actualizarAfiliado(ddlAlta.id, txtAlta.id);
+                });
+            }
+
+            // Edición
+            var ddlEdit = document.getElementById("<%= ddlEditObraSocial.ClientID %>");
+            var txtEdit = document.getElementById("<%= txtEditNroAfiliado.ClientID %>");
+            if (ddlEdit && txtEdit) {
+                actualizarAfiliado(ddlEdit.id, txtEdit.id);
+                ddlEdit.addEventListener("change", function () {
+                    actualizarAfiliado(ddlEdit.id, txtEdit.id);
+                });
+            }
+        });
 
     </script>
 

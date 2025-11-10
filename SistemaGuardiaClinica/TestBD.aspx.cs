@@ -29,26 +29,25 @@ namespace SistemaGuardiaClinica
 
                     var resultado = new StringBuilder();
                     resultado.Append($"✅ <strong>{nombre}</strong> - CONEXIÓN EXITOSA<br/>");
-                    resultado.Append($"• Servidor: {connection.DataSource}<br/>");
-                    resultado.Append($"• Base de datos: {connection.Database}<br/>");
-                    resultado.Append($"• Estado: {connection.State}<br/>");
-                    resultado.Append($"• Versión: {connection.ServerVersion}<br/>");
+                    resultado.Append($"Servidor: {connection.DataSource}<br/>");
+                    resultado.Append($"Base de datos: {connection.Database}<br/>");
+                    resultado.Append($"Estado: {connection.State}<br/>");
+                    resultado.Append($"Versión: {connection.ServerVersion}<br/>");
 
-                    lblResultado.Text = resultado.ToString();
-                    lblResultado.CssClass = "alert alert-success";
+                    divResultado.InnerHtml = $"<div class='alert alert-success'>{resultado}</div>";
                 }
             }
             catch (Exception ex)
             {
                 var resultado = new StringBuilder();
                 resultado.Append($"❌ <strong>{nombre}</strong> - ERROR<br/>");
-                resultado.Append($"• Connection String: {connectionString}<br/>");
-                resultado.Append($"• Error: {ex.Message}<br/>");
+                resultado.Append($"Connection String: {connectionString}<br/>");
+                resultado.Append($"Error: {ex.Message}<br/>");
 
-                lblResultado.Text = resultado.ToString();
-                lblResultado.CssClass = "alert alert-danger";
+                divResultado.InnerHtml = $"<div class='alert alert-danger'>{resultado}</div>";
             }
         }
+
 
         protected void btnTest1_Click(object sender, EventArgs e)
         {
@@ -90,15 +89,13 @@ namespace SistemaGuardiaClinica
                     resultado.Append($"• Email: {usuario.Email}<br/>");
                     resultado.Append($"• Especialidad: {usuario.Especialidad ?? "N/A"}<br/>");
 
-                    lblResultado.Text = resultado.ToString();
-                    lblResultado.CssClass = "alert alert-success";
+                    divResultado.InnerHtml = $"<div class='alert alert-success'>{resultado}</div>";
 
                     Session["Usuario"] = usuario;
                 }
                 else
                 {
-                    lblResultado.Text = "❌ Login Fallido - Credenciales incorrectas o usuario no encontrado";
-                    lblResultado.CssClass = "alert alert-danger";
+                    divResultado.InnerHtml = "<div class='alert alert-danger'>❌ Login Fallido - Credenciales incorrectas o usuario no encontrado</div>";
                 }
             }
             catch (Exception ex)
@@ -108,8 +105,7 @@ namespace SistemaGuardiaClinica
                 resultado.Append($"<br/><strong>Detalles:</strong><br/>");
                 resultado.Append($"{ex.InnerException?.Message}<br/>");
 
-                lblResultado.Text = resultado.ToString();
-                lblResultado.CssClass = "alert alert-danger";
+                divResultado.InnerHtml = $"<div class='alert alert-danger'>{resultado}</div>";
             }
         }
 
@@ -120,8 +116,7 @@ namespace SistemaGuardiaClinica
                 var connectionString = WebConfigurationManager.ConnectionStrings["ClinicaConnectionString"]?.ConnectionString;
                 if (string.IsNullOrEmpty(connectionString))
                 {
-                    lblResultado.Text = "❌ No se encontró connection string en Web.config";
-                    lblResultado.CssClass = "alert alert-danger";
+                    divResultado.InnerHtml = "<div class='alert alert-danger'>❌ No se encontró connection string en Web.config</div>";
                     return;
                 }
 
@@ -133,10 +128,10 @@ namespace SistemaGuardiaClinica
 
                     // Verificar tablas existentes
                     string query = @"
-                        SELECT TABLE_NAME, TABLE_TYPE 
-                        FROM INFORMATION_SCHEMA.TABLES 
-                        WHERE TABLE_TYPE = 'BASE TABLE'
-                        ORDER BY TABLE_NAME";
+                SELECT TABLE_NAME, TABLE_TYPE 
+                FROM INFORMATION_SCHEMA.TABLES 
+                WHERE TABLE_TYPE = 'BASE TABLE'
+                ORDER BY TABLE_NAME";
 
                     using (var command = new SqlCommand(query, connection))
                     using (var reader = command.ExecuteReader())
@@ -163,20 +158,19 @@ namespace SistemaGuardiaClinica
                                 resultado.Append($"📈 <strong>{tabla}:</strong> {cantidad} registros<br/>");
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception exTabla)
                         {
-                            resultado.Append($"❌ <strong>{tabla}:</strong> No existe - {ex.Message}<br/>");
+                            resultado.Append($"❌ <strong>{tabla}:</strong> No existe - {exTabla.Message}<br/>");
                         }
                     }
                 }
 
-                lblResultado.Text = resultado.ToString();
-                lblResultado.CssClass = "alert alert-info";
+                // Mostrar resultado formateado
+                divResultado.InnerHtml = $"<div class='alert alert-info'>{resultado}</div>";
             }
             catch (Exception ex)
             {
-                lblResultado.Text = $"❌ Error verificando tablas: {ex.Message}";
-                lblResultado.CssClass = "alert alert-danger";
+                divResultado.InnerHtml = $"<div class='alert alert-danger'>❌ Error verificando tablas: {ex.Message}</div>";
             }
         }
     }

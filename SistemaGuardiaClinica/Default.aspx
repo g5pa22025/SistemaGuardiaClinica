@@ -80,18 +80,6 @@
                     <i class="bi bi-clipboard2-pulse"></i>
                     <span>Atender Paciente</span>
                 </a>
-
-                <a runat="server" href="~/Medicos/HistoriaClinica.aspx"
-                   class="btn btn-outline-primary d-flex align-items-center gap-2 px-3">
-                    <i class="bi bi-journal-medical"></i>
-                    <span>Historia Clínica</span>
-                </a>
-
-                <a runat="server" href="~/Guardia/Listado.aspx"
-                   class="btn btn-outline-success d-flex align-items-center gap-2 px-3">
-                    <i class="bi bi-list-check"></i>
-                    <span>Pacientes en Guardia</span>
-                </a>
             </div>
         </div>
     </div>

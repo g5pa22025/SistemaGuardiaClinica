@@ -21,7 +21,7 @@
                     
                     <div class="mb-3">
                         <asp:Button ID="btnTest1" runat="server" Text="Probar: localhost\\SQLEXPRESS" 
-                            CssClass="btn btn-primary me-2 mb-2" OnClick="btnTest1_Click" />
+                            CssClass="btn btn-primary me-2 mb-2" OnClick="btnTest1_Click" /> 
                         <asp:Button ID="btnTest2" runat="server" Text="Probar: .\\SQLEXPRESS" 
                             CssClass="btn btn-secondary me-2 mb-2" OnClick="btnTest2_Click" />
                         <asp:Button ID="btnTest3" runat="server" Text="Probar: (local)\\SQLEXPRESS" 
@@ -37,7 +37,7 @@
                     CssClass="btn btn-warning" OnClick="btnVerTablas_Click" />
             </div>
             
-            <asp:Label ID="lblResultado" runat="server" Text="" CssClass="d-block mt-3"></asp:Label>
+            <div id="divResultado" runat="server" class="mt-3"></div>
         </div>
     </form>
 </body>

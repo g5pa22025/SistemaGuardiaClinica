@@ -199,8 +199,13 @@ namespace SistemaGuardiaClinica.Pacientes
         private string LimpiarAfiliado(string nro)
         {
             nro = (nro ?? "").Trim();
+
             if (nro.Length == 0)
                 throw new Exception("El campo Nro. Afiliado es obligatorio.");
+
+            // Si viene "SIN COBERTURA" desde la UI, lo dejamos así
+            if (string.Equals(nro, "SIN COBERTURA", StringComparison.OrdinalIgnoreCase))
+                return "SIN COBERTURA";
 
             var soloAlfaNum = new string(nro.Where(char.IsLetterOrDigit).ToArray());
             if (soloAlfaNum.Length > 10)
@@ -234,7 +239,6 @@ namespace SistemaGuardiaClinica.Pacientes
                 args.IsValid = false;
             }
         }
-
 
         private void LimpiarModalAlta()
         {
@@ -448,5 +452,6 @@ namespace SistemaGuardiaClinica.Pacientes
                 });
             }
         }
+
     }
 }

@@ -65,9 +65,10 @@
                                     <th>Fecha Ingreso</th>
                                     <th>DNI</th>
                                     <th>Paciente</th>
-                                    <th style="width: 40%">Síntomas (Triage)</th>
-                                    <th>Prioridad</th>
-                                    <th class="text-end" style="width: 220px;"></th>
+                                    <th>Síntomas (Triage)</th>
+                                    <th style="width: 130px;">Prioridad</th>
+                                    <th style="width: 120px;">Estado</th>
+                                    <th style="width: 290px;"><%= new string('\n', 20).Replace("\n", "&nbsp;") %>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -83,15 +84,36 @@
                         <asp:Literal runat="server" Mode="PassThrough"
                             Text='<%# GetBadge((int?)Eval("PrioridadFinal")) %>' />
                     </td>
+
+                    <td>
+                        <asp:Literal runat="server" Mode="PassThrough"
+                            Text='<%# GetEstadoBadge(Convert.ToString(Eval("Estado"))) %>' />
+                    </td>
+
                     <td class="text-end">
-                        <button type="button" class="btn btn-sm btn-primary"
+                        <%-- si está atendido, deshabilito el botón de consulta --%>
+                        <button type="button"
+                            class='btn btn-sm <%# Convert.ToString(Eval("Estado")) == "Atendido" ? "btn-outline-secondary" : "btn-primary" %>'
+                            <%# Convert.ToString(Eval("Estado")) == "Atendido" ? "disabled=\"disabled\"" : "" %>
                             onclick='openConsultaModal(
                                 "<%# Eval("Id") %>",
                                 "<%# (Eval("Paciente.Apellido") + ", " + Eval("Paciente.Nombre")).ToString().Replace("\"","\\\"") %>"
-                            )'>
-                            <i class="bi bi-play-circle me-1"></i>Iniciar Consulta
+                                )'>
+                            <i class="bi bi-play-circle me-1"></i>
+                            <%# Convert.ToString(Eval("Estado")) == "Atendido" ? "Atendido" : "Iniciar Consulta" %>
                         </button>
+
+                        <%-- Historia clínica: solo clickeable cuando Estado = Atendido --%>
+                        <a runat="server"
+                            class='btn btn-sm ms-2 <%# Convert.ToString(Eval("Estado")) == "Atendido" 
+                                    ? "btn-outline-secondary" 
+                                    : "btn-outline-secondary disabled" %>'
+                            href='<%# Convert.ToString(Eval("Estado")) == "Atendido" ? ResolveUrl("~/Medicos/HistoriaClinica.aspx?pacienteId=" + Eval("PacienteId")) : "#" %>'
+                            onclick='<%# Convert.ToString(Eval("Estado")) == "Atendido" ? "" : "return false;" %>'>
+                            <i class="bi bi-journal-text me-1"></i>Historia
+                        </a>
                     </td>
+
                 </tr>
             </ItemTemplate>
 
@@ -123,9 +145,33 @@
 
                     <div class="mb-3">
                         <label class="form-label">Notas de Consulta / Diagnóstico</label>
-                        <asp:TextBox ID="txtConsultaNotas" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="6"
+                        <asp:TextBox ID="txtConsultaNotas" runat="server" CssClass="form-control"
+                            TextMode="MultiLine" Rows="6"
                             placeholder="Escriba el diagnóstico, tratamiento, notas..."></asp:TextBox>
                     </div>
+
+                    <div class="form-check mb-2">
+                        <asp:CheckBox ID="chkTieneMedicamentos" runat="server"
+                            CssClass="form-check-input"
+                            onclick="toggleMedicamentos()" />
+                        <label class="form-check-label" for="<%= chkTieneMedicamentos.ClientID %>">
+                            Indicar medicamentos
+                        </label>
+                    </div>
+
+                    <div id="divMedicamentos" class="mb-3" style="display: none;">
+                        <label class="form-label">Medicamentos</label>
+                        <asp:DropDownList ID="ddlMedicamentos" runat="server" CssClass="form-select">
+                            <asp:ListItem Value="">-- Seleccione --</asp:ListItem>
+                            <asp:ListItem>Paracetamol 500 mg c/8 hs</asp:ListItem>
+                            <asp:ListItem>Ibuprofeno 400 mg c/8 hs</asp:ListItem>
+                            <asp:ListItem>Omeprazol 20 mg desayuno</asp:ListItem>
+                            <asp:ListItem>Amoxicilina 500 mg c/8 hs 7 días</asp:ListItem>
+                            <asp:ListItem>Salbutamol inhalador 2 puff c/6 hs</asp:ListItem>
+                            <%-- lo que quieras agregar --%>
+                        </asp:DropDownList>
+                    </div>
+
                 </div>
 
                 <div class="modal-footer">
@@ -150,4 +196,31 @@
             new bootstrap.Modal(document.getElementById('modalConsulta')).show();
         }
     </script>
+
+    <script>
+        function toggleMedicamentos() {
+            var chk = document.getElementById("<%= chkTieneMedicamentos.ClientID %>");
+            var div = document.getElementById("divMedicamentos");
+            if (!chk || !div) return;
+            div.style.display = chk.checked ? "block" : "none";
+        }
+
+        // si reusás el modal, asegúrate de resetear el estado al abrir
+        function openConsultaModal(guardiaId, nombre) {
+            document.getElementById("<%= hfConsultaGuardiaId.ClientID %>").value = guardiaId;
+            document.getElementById("consultaPacienteNombre").innerText = nombre;
+
+            document.getElementById("<%= txtConsultaNotas.ClientID %>").value = "";
+
+            var chk = document.getElementById("<%= chkTieneMedicamentos.ClientID %>");
+            var div = document.getElementById("divMedicamentos");
+            var ddl = document.getElementById("<%= ddlMedicamentos.ClientID %>");
+            if (chk) chk.checked = false;
+            if (div) div.style.display = "none";
+            if (ddl) ddl.selectedIndex = 0;
+
+            new bootstrap.Modal(document.getElementById('modalConsulta')).show();
+        }
+    </script>
+
 </asp:Content>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Negocio.Services; // Ya lo tienes
+using Negocio.Services; 
 using Entidades;
 
 namespace SistemaGuardiaClinica.Medicos
@@ -18,12 +18,11 @@ namespace SistemaGuardiaClinica.Medicos
 
         private void SetUsuarioEnHeader()
         {
-            // (Tu código para setear el usuario del MasterPage va aquí)
+            // (Código para setear el usuario del MasterPage)
             var lblUsuario = Master.FindControl("lblUsuario") as Label;
             if (lblUsuario != null)
             {
                 lblUsuario.Text = "Médico (Ejemplo)";
-                // Aquí iría tu lógica de Session...
             }
         }
 
@@ -33,9 +32,11 @@ namespace SistemaGuardiaClinica.Medicos
             {
                 var svc = new GuardiaService();
 
-                // --- CAMBIO ---
-                // ¡Usamos tu método! Esto es correcto.
-                var lista = svc.ObtenerPacientesEnTriaje();
+                // saco la especialidad del médico logueado
+                var especialidad = ObtenerEspecialidadMedicoActual();
+
+                // solo guardias de esa especialidad (Triaje / Atendido)
+                var lista = svc.ObtenerPacientesEnTriajePorEspecialidad(especialidad);
 
                 rpTriageados.DataSource = lista;
                 rpTriageados.DataBind();
@@ -49,7 +50,6 @@ namespace SistemaGuardiaClinica.Medicos
             }
         }
 
-        // --- MÉTODO ACTUALIZADO ---
         // Se dispara al presionar "Finalizar Consulta" en el modal
         protected void btnFinalizarConsulta_Click(object sender, EventArgs e)
         {
@@ -62,25 +62,34 @@ namespace SistemaGuardiaClinica.Medicos
                 if (string.IsNullOrWhiteSpace(notas))
                     throw new Exception("Debe ingresar el diagnóstico o notas.");
 
-                // --- MEJORA USANDO TU SERVICE ---
+                // Obtenemos el Id del médico desde la sesión
+                int medicoId = 0;
+
+                if (Session["UsuarioId"] != null)
+                    medicoId = Convert.ToInt32(Session["UsuarioId"]);
+
+                if (medicoId <= 0 && Session["Usuario"] is Usuario u && u.Id > 0)
+                    medicoId = u.Id;
+
+                if (medicoId <= 0)
+                    throw new Exception("No se encontró el Id del médico en sesión.");
+
                 var svc = new GuardiaService();
 
-                // Tu service pide diagnóstico y medicamentos por separado.
-                // Como el modal simple tiene un solo campo, pasamos
-                // todo a 'diagnostico' y dejamos 'medicamentos' vacío.
-                // (Si quieres, puedes agregar otro TextBox en el modal para medicamentos)
                 string diagnostico = notas;
                 string medicamentos = "";
 
-                // Llamamos al método del servicio, que maneja la lógica
-                svc.FinalizarAtencion(guardiaId, diagnostico, medicamentos);
+                if (chkTieneMedicamentos.Checked)
+                    medicamentos = ddlMedicamentos.SelectedValue; // o SelectedItem.Text
+
+                svc.FinalizarAtencion(guardiaId, medicoId, diagnostico, medicamentos);
 
                 phMsg.Controls.Add(new Literal
                 {
                     Text = "<div class='alert alert-success'>Consulta finalizada correctamente.</div>"
                 });
 
-                Bind(); // Recargamos la lista (el paciente desaparecerá)
+                Bind(); // se recarga la lista, pero el paciente sigue listado con Estado = "Atendido"
             }
             catch (Exception ex)
             {
@@ -90,9 +99,6 @@ namespace SistemaGuardiaClinica.Medicos
                 });
             }
         }
-
-
-        // --- MÉTODOS AYUDANTES (copiados de tu Triage.cs) ---
 
         public string GetBadge(int? prioridad)
         {
@@ -131,6 +137,41 @@ namespace SistemaGuardiaClinica.Medicos
             if (p < 1 || p > 5) p = 5; // por si viene algo raro
 
             return $"row-pr-{p}";
+        }
+
+        public string GetEstadoBadge(string estado)
+        {
+            estado = (estado ?? "").Trim();
+
+            string css = "bg-secondary";
+            string texto = estado;
+
+            if (estado.Equals("Triaje", StringComparison.OrdinalIgnoreCase))
+            {
+                css = "bg-info";
+                texto = "En atención";
+            }
+            else if (estado.Equals("Atendido", StringComparison.OrdinalIgnoreCase))
+            {
+                css = "bg-success";
+                texto = "Atendido";
+            }
+            else if (estado.Equals("Espera", StringComparison.OrdinalIgnoreCase))
+            {
+                css = "bg-warning";
+                texto = "En espera";
+            }
+
+            return $"<span class='badge {css} rounded-pill px-3 py-2'>{texto}</span>";
+        }
+
+        private string ObtenerEspecialidadMedicoActual()
+        {
+            // En el login guardo el Usuario completo en sesión
+            if (Session["Usuario"] is Usuario u && !string.IsNullOrWhiteSpace(u.Especialidad))
+                return u.Especialidad;
+
+            return null;
         }
     }
 }
