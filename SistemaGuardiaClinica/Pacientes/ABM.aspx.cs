@@ -38,7 +38,7 @@ namespace SistemaGuardiaClinica.Pacientes
             using (var ctx = new ClinicaContext())
             {
                 // Estados que consideramos "guardia activa"
-                string[] activos = { "Espera", "Triaje", "Atencion" };
+                string[] activos = { "Espera", "Triaje", "Triaje" };
 
                 // Query base: SOLO pacientes SIN guardia activa
                 var q = ctx.Pacientes
@@ -79,26 +79,33 @@ namespace SistemaGuardiaClinica.Pacientes
                     return;
                 }
 
-                //int prioridad;
-                //if (!int.TryParse(txtPrioridad.Text, out prioridad) || prioridad < 1 || prioridad > 5)
-                //    throw new Exception("La prioridad debe ser un número entre 1 y 5.");
+                var fechaNac = ValidarFechaNacimiento(txtFechaNacimiento.Text);
 
-                if (!DateTime.TryParse(txtFechaNacimiento.Text, out var fechaNac))
-                    throw new Exception("Fecha de nacimiento inválida.");
+                var nombre = (txtNombre.Text ?? "").Trim();
+                var apellido = (txtApellido.Text ?? "").Trim();
+                ValidarNombreApellido(nombre, apellido);
+
+                var telefono = ValidarTelefono(txtTelefono.Text);
+                var email = ValidarEmail(txtEmail.Text);
+                var direccion = ValidarDireccion(txtDireccion.Text);
+                var nroAfiliado = LimpiarAfiliado(txtNroAfiliado.Text);
+                var obraSocial = ddlObraSocial.SelectedValue;
+                if (string.IsNullOrWhiteSpace(obraSocial))
+                    throw new Exception("El campo Obra Social / Prepaga es obligatorio.");
 
                 var p = new Paciente
                 {
                     DNI = (txtDni.Text ?? "").Trim(),
-                    Nombre = (txtNombre.Text ?? "").Trim(),
-                    Apellido = (txtApellido.Text ?? "").Trim(),
-                    Telefono = (txtTelefono.Text ?? "").Trim(),
-                    Email = (txtEmail.Text ?? "").Trim(),
-                    Direccion = (txtDireccion.Text ?? "").Trim(),
-                    ObraSocial = (txtObraSocial.Text ?? "").Trim(),
-                    NumeroAfiliado = (txtNroAfiliado.Text ?? "").Trim(),
+                    Nombre = nombre,
+                    Apellido = apellido,
+                    Telefono = telefono,
+                    Email = email,
+                    Direccion = direccion,
+                    ObraSocial = obraSocial,
+                    NumeroAfiliado = nroAfiliado,
                     Genero = ddlGenero.SelectedValue,
                     FechaNacimiento = fechaNac,
-                    Prioridad = 5 //Lo seteo por defecto en 5. No urgente (Azul)
+                    Prioridad = 5 // No urgente (Azul)
                 };
 
                 using (var ctx = new ClinicaContext())
@@ -125,6 +132,110 @@ namespace SistemaGuardiaClinica.Pacientes
             }
         }
 
+        //Validaciones
+
+        private DateTime ValidarFechaNacimiento(string valor)
+        {
+            if (!DateTime.TryParse(valor, out var fecha))
+                throw new Exception("Fecha de nacimiento inválida.");
+
+            if (fecha > DateTime.Today)
+                throw new Exception("La fecha de nacimiento no puede ser futura.");
+
+            if (fecha < new DateTime(1900, 1, 1))
+                throw new Exception("La fecha de nacimiento no puede ser anterior a 1900.");
+
+            return fecha;
+        }
+
+        private void ValidarNombreApellido(string nombre, string apellido)
+        {
+            if (string.IsNullOrWhiteSpace(nombre) || nombre.Any(char.IsDigit))
+                throw new Exception("Nombre inválido. No debe contener números.");
+
+            if (string.IsNullOrWhiteSpace(apellido) || apellido.Any(char.IsDigit))
+                throw new Exception("Apellido inválido. No debe contener números.");
+        }
+
+        private string ValidarTelefono(string tel)
+        {
+            tel = (tel ?? "").Trim();
+            if (tel.Length == 0)
+                throw new Exception("El campo Teléfono es obligatorio.");
+
+            if (!tel.All(char.IsDigit))
+                throw new Exception("El teléfono debe contener solo números.");
+
+            if (tel.Length > 15)
+                throw new Exception("El teléfono no puede superar los 15 dígitos.");
+
+            return tel;
+        }
+
+        private string ValidarEmail(string email)
+        {
+            email = (email ?? "").Trim();
+            if (email.Length == 0)
+                throw new Exception("El campo Email es obligatorio.");
+
+            if (email.Length > 40)
+                throw new Exception("El email no puede superar los 40 caracteres.");
+
+            return email;
+        }
+
+        private string ValidarDireccion(string dir)
+        {
+            dir = (dir ?? "").Trim();
+            if (dir.Length == 0)
+                throw new Exception("El campo Dirección es obligatorio.");
+
+            if (dir.Length > 30)
+                throw new Exception("La dirección no puede superar los 30 caracteres.");
+
+            return dir;
+        }
+
+        private string LimpiarAfiliado(string nro)
+        {
+            nro = (nro ?? "").Trim();
+            if (nro.Length == 0)
+                throw new Exception("El campo Nro. Afiliado es obligatorio.");
+
+            var soloAlfaNum = new string(nro.Where(char.IsLetterOrDigit).ToArray());
+            if (soloAlfaNum.Length > 10)
+                soloAlfaNum = soloAlfaNum.Substring(0, 10);
+
+            return soloAlfaNum;
+        }
+
+        protected void cvFechaNac_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            try
+            {
+                ValidarFechaNacimiento(args.Value);
+                args.IsValid = true;
+            }
+            catch
+            {
+                args.IsValid = false;
+            }
+        }
+
+        protected void cvEditFechaNac_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            try
+            {
+                ValidarFechaNacimiento(args.Value);
+                args.IsValid = true;
+            }
+            catch
+            {
+                args.IsValid = false;
+            }
+        }
+
+
         private void LimpiarModalAlta()
         {
             txtDni.Text = txtNombre.Text = txtApellido.Text = txtTelefono.Text = txtEmail.Text = "";
@@ -137,29 +248,43 @@ namespace SistemaGuardiaClinica.Pacientes
         {
             try
             {
+                if (!Page.IsValid)
+                {
+                    ShowMsg("Revisá los datos del paciente.", "warning");
+                    return;
+                }
+
                 if (!int.TryParse(hfEditId.Value, out var id) || id <= 0)
                     throw new Exception("Id inválido.");
 
-                //if (!int.TryParse(txtEditPrioridad.Text, out var prioridad) || prioridad < 1 || prioridad > 5)
-                //    throw new Exception("La prioridad debe ser un número entre 1 y 5.");
+                var fechaNac = ValidarFechaNacimiento(txtEditFechaNac.Text);
 
-                if (!DateTime.TryParse(txtEditFechaNac.Text, out var fechaNac))
-                    throw new Exception("Fecha de nacimiento inválida.");
+                var nombre = (txtEditNombre.Text ?? "").Trim();
+                var apellido = (txtEditApellido.Text ?? "").Trim();
+                ValidarNombreApellido(nombre, apellido);
+
+                var telefono = ValidarTelefono(txtEditTelefono.Text);
+                var email = ValidarEmail(txtEditEmail.Text);
+                var direccion = ValidarDireccion(txtEditDireccion.Text);
+                var nroAfiliado = LimpiarAfiliado(txtEditNroAfiliado.Text);
+                var obraSocial = ddlEditObraSocial.SelectedValue;
+                if (string.IsNullOrWhiteSpace(obraSocial))
+                    throw new Exception("El campo Obra Social / Prepaga es obligatorio.");
 
                 using (var ctx = new ClinicaContext())
                 {
                     var ent = ctx.Pacientes.FirstOrDefault(x => x.Id == id);
                     if (ent == null) throw new Exception("Paciente no encontrado.");
 
-                    ent.Nombre = (txtEditNombre.Text ?? "").Trim();
-                    ent.Apellido = (txtEditApellido.Text ?? "").Trim();
-                    ent.Telefono = (txtEditTelefono.Text ?? "").Trim();
-                    ent.Email = (txtEditEmail.Text ?? "").Trim();
-                    ent.ObraSocial = (txtEditObraSocial.Text ?? "").Trim();
-                    ent.NumeroAfiliado = (txtEditNroAfiliado.Text ?? "").Trim();
+                    ent.Nombre = nombre;
+                    ent.Apellido = apellido;
+                    ent.Telefono = telefono;
+                    ent.Email = email;
+                    ent.ObraSocial = obraSocial;
+                    ent.NumeroAfiliado = nroAfiliado;
                     ent.Genero = ddlEditGenero.SelectedValue;
                     ent.FechaNacimiento = fechaNac;
-                    ent.Direccion = (txtEditDireccion.Text ?? "").Trim();
+                    ent.Direccion = direccion;
                     // DNI queda readonly (no se toca)
 
                     ctx.SaveChanges();

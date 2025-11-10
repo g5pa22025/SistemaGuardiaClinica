@@ -97,18 +97,40 @@ namespace SistemaGuardiaClinica.Medicos
         public string GetBadge(int? prioridad)
         {
             int p = prioridad.GetValueOrDefault(1);
-            string css = p <= 2 ? "bg-success"
-                         : p <= 4 ? "bg-warning"
-                         : "bg-danger";
+            string css;
+
+            switch (p)
+            {
+                case 1:
+                    css = "bg-danger";        // Rojo - Inmediato
+                    break;
+                case 2:
+                    css = "bg-prio-orange";   // Naranja - Muy urgente
+                    break;
+                case 3:
+                    css = "bg-warning";       // Amarillo - Urgente
+                    break;
+                case 4:
+                    css = "bg-success";       // Verde - Menos urgente
+                    break;
+                case 5:
+                    css = "bg-primary";       // Azul - No urgente
+                    break;
+                default:
+                    css = "bg-secondary";
+                    break;
+            }
+
             return $"<span class='badge {css} rounded-pill px-3 py-2'>P{p}</span>";
         }
 
+        // Clase de fila por prioridad (para fondo suave)
         public string GetRowClass(int? prioridad)
         {
             int p = prioridad.GetValueOrDefault(1);
-            if (p <= 2) return "row-pr-1";
-            if (p <= 4) return "row-pr-3";
-            return "row-pr-5";
+            if (p < 1 || p > 5) p = 5; // por si viene algo raro
+
+            return $"row-pr-{p}";
         }
     }
 }

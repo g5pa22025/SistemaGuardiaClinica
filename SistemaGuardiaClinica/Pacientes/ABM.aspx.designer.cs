@@ -150,6 +150,15 @@ namespace SistemaGuardiaClinica.Pacientes
         protected global::System.Web.UI.WebControls.TextBox txtFechaNacimiento;
 
         /// <summary>
+        /// Control cvFechaNac.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator cvFechaNac;
+
+        /// <summary>
         /// Control txtTelefono.
         /// </summary>
         /// <remarks>
@@ -177,13 +186,13 @@ namespace SistemaGuardiaClinica.Pacientes
         protected global::System.Web.UI.WebControls.TextBox txtDireccion;
 
         /// <summary>
-        /// Control txtObraSocial.
+        /// Control ddlObraSocial.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtObraSocial;
+        protected global::System.Web.UI.WebControls.DropDownList ddlObraSocial;
 
         /// <summary>
         /// Control txtNroAfiliado.
@@ -249,6 +258,15 @@ namespace SistemaGuardiaClinica.Pacientes
         protected global::System.Web.UI.WebControls.TextBox txtEditFechaNac;
 
         /// <summary>
+        /// Control cvEditFechaNac.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator cvEditFechaNac;
+
+        /// <summary>
         /// Control txtEditTelefono.
         /// </summary>
         /// <remarks>
@@ -276,13 +294,13 @@ namespace SistemaGuardiaClinica.Pacientes
         protected global::System.Web.UI.WebControls.TextBox txtEditDireccion;
 
         /// <summary>
-        /// Control txtEditObraSocial.
+        /// Control ddlEditObraSocial.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEditObraSocial;
+        protected global::System.Web.UI.WebControls.DropDownList ddlEditObraSocial;
 
         /// <summary>
         /// Control txtEditNroAfiliado.

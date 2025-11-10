@@ -8,14 +8,46 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 
     <style>
-        body { background: #f6f8fb; }
-        .page-header { border-bottom: 1px solid #e9ecef; }
-        .card { border-radius: 1rem; }
-        .table thead th { white-space: nowrap; }
-        .action-buttons .btn { min-width: 40px; }
-        .modal .form-label { font-weight: 600; }
-        .sticky-toolbar { position: sticky; top: 0; background: #f6f8fb; z-index: 2; padding-top: .5rem; }
-        .bg-orange { background-color: #fd7e14 !important; }
+        body {
+            background: #f6f8fb;
+        }
+
+        .page-header {
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card {
+            border-radius: 1rem;
+        }
+
+        .table thead th {
+            white-space: nowrap;
+        }
+
+        .action-buttons .btn {
+            min-width: 40px;
+        }
+
+        .modal .form-label {
+            font-weight: 600;
+        }
+
+        .sticky-toolbar {
+            position: sticky;
+            top: 0;
+            background: #f6f8fb;
+            z-index: 2;
+            padding-top: .5rem;
+        }
+
+        .bg-orange {
+            background-color: #fd7e14 !important;
+        }
+
+        .required-star {
+            color: #dc3545; /* rojo bootstrap */
+            margin-left: 2px;
+        }
     </style>
 
     <div class="container py-4">
@@ -23,11 +55,11 @@
         <div class="d-flex align-items-center justify-content-between mb-3 page-header">
             <div class="d-flex align-items-center gap-3">
                 <button type="button" class="btn btn-outline-dark d-flex align-items-center"
-                        onclick="safeBack()">
-                    <i class="bi bi-arrow-left me-1"></i> Volver
+                    onclick="safeBack()">
+                    <i class="bi bi-arrow-left me-1"></i>Volver
                 </button>
                 <h3 class="mb-0 d-flex align-items-center">
-                    <i class="bi bi-people-fill me-2 text-primary"></i> Pacientes
+                    <i class="bi bi-people-fill me-2 text-primary"></i>Pacientes
                 </h3>
             </div>
             <div class="d-flex align-items-center gap-2 sticky-toolbar">
@@ -36,7 +68,7 @@
                 <asp:Button ID="btnBuscar" runat="server" CssClass="btn btn-outline-primary" Text="Buscar" OnClick="btnBuscar_Click" />
                 <asp:Button ID="btnLimpiar" runat="server" CssClass="btn btn-outline-secondary" Text="Limpiar" OnClick="btnLimpiar_Click" />
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAlta">
-                    <i class="bi bi-person-plus me-1"></i> Nuevo
+                    <i class="bi bi-person-plus me-1"></i>Nuevo
                 </button>
             </div>
         </div>
@@ -73,20 +105,20 @@
 
                                     <!-- Registrar ingreso (abre modal) -->
                                     <button type="button"
-                                            class="btn btn-success btn-sm d-flex align-items-center"
-                                            title="Registrar ingreso del paciente a la guardia"
-                                            onclick='openIngresoModal(
+                                        class="btn btn-success btn-sm d-flex align-items-center"
+                                        title="Registrar ingreso del paciente a la guardia"
+                                        onclick='openIngresoModal(
                                                 "<%# Eval("Id") %>",
                                                 "<%# (Eval("Apellido") + ", " + Eval("Nombre")).ToString().Replace("\"","\\\"") %>",
                                                 "<%# Eval("DNI") %>"
                                             )'>
-                                        <i class="bi bi-clipboard-plus me-1"></i> Registrar Ingreso
+                                        <i class="bi bi-clipboard-plus me-1"></i>Registrar Ingreso
                                     </button>
 
                                     <!-- Editar -->
                                     <button type="button" class="btn btn-sm btn-outline-warning"
-                                            title="Editar paciente"
-                                            onclick='openEditModal(
+                                        title="Editar paciente"
+                                        onclick='openEditModal(
                                                 "<%# Eval("Id") %>",
                                                 "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("DNI")) ?? "") %>",
                                                 "<%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("Nombre")) ?? "") %>",
@@ -104,8 +136,8 @@
 
                                     <!-- Eliminar -->
                                     <button type="button" class="btn btn-sm btn-outline-danger"
-                                            title="Eliminar paciente"
-                                            onclick='openDeleteModal(
+                                        title="Eliminar paciente"
+                                        onclick='openDeleteModal(
                                                 "<%# Eval("Id") %>", 
                                                 "<%# Eval("DNI") %>", 
                                                 "<%# (Eval("Apellido") + ", " + Eval("Nombre")).ToString().Replace("\"","\\\"") %>"
@@ -131,320 +163,583 @@
 
     <!-- ================= MODAL ALTA ================= -->
     <div class="modal fade" id="modalAlta" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title">
-              <i class="bi bi-person-plus me-2"></i> Nuevo Paciente
-            </h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-
-          <div class="modal-body">
-            <div class="row g-3">
-
-              <!-- IDENTIFICACIÓN -->
-              <div class="col-12">
-                <h6 class="text-uppercase text-muted mb-2">Identificación</h6>
-                <hr class="mt-0 mb-3" />
-              </div>
-
-              <div class="col-md-3">
-                <div class="form-floating">
-                    <asp:TextBox ID="txtDni" runat="server" CssClass="form-control" 
-                         MaxLength="8" placeholder="DNI"
-                         onkeypress="return soloNumeros(event)"
-                         oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
-                    <label for="txtDni">DNI</label>
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-plus me-2"></i>Nuevo Paciente
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <asp:RequiredFieldValidator ControlToValidate="txtDni" runat="server"
-                    CssClass="text-danger" ErrorMessage="DNI obligatorio"
-                    Display="Dynamic" ValidationGroup="alta" />
-              </div>
 
-              <div class="col-md-4">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control" placeholder="Nombre" />
-                  <label for="txtNombre">Nombre</label>
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        <!-- IDENTIFICACIÓN -->
+                        <div class="col-12">
+                            <h6 class="text-uppercase text-muted mb-2">Identificación</h6>
+                            <hr class="mt-0 mb-3" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtDni" runat="server" CssClass="form-control"
+                                    MaxLength="8" placeholder="DNI"
+                                    onkeypress="return soloNumeros(event)"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                                <label for="txtDni">
+                                    DNI <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator ControlToValidate="txtDni" runat="server"
+                                CssClass="text-danger" ErrorMessage="El campo DNI es obligatorio."
+                                Display="Dynamic" ValidationGroup="alta" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control"
+                                    placeholder="Nombre" MaxLength="50" />
+                                <label for="txtNombre">
+                                    Nombre <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator ControlToValidate="txtNombre" runat="server"
+                                CssClass="text-danger"
+                                ErrorMessage="El campo Nombre es obligatorio."
+                                Display="Dynamic" ValidationGroup="alta" />
+                            <asp:RegularExpressionValidator runat="server"
+                                ControlToValidate="txtNombre"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="alta"
+                                ErrorMessage="El nombre no puede contener números."
+                                ValidationExpression="^([A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+)$" />
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtApellido" runat="server" CssClass="form-control"
+                                    placeholder="Apellido" MaxLength="50" />
+                                <label for="txtApellido">
+                                    Apellido <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator ControlToValidate="txtApellido" runat="server"
+                                CssClass="text-danger"
+                                ErrorMessage="El campo Apellido es obligatorio."
+                                Display="Dynamic" ValidationGroup="alta" />
+                            <asp:RegularExpressionValidator runat="server"
+                                ControlToValidate="txtApellido"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="alta"
+                                ErrorMessage="El apellido no puede contener números."
+                                ValidationExpression="^([A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+)$" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <asp:DropDownList ID="ddlGenero" runat="server" CssClass="form-select">
+                                    <asp:ListItem Value="" Selected="True">-- Seleccione --</asp:ListItem>
+                                    <asp:ListItem Value="Masculino">Masculino</asp:ListItem>
+                                    <asp:ListItem Value="Femenino">Femenino</asp:ListItem>
+                                    <asp:ListItem Value="Otro">Otro</asp:ListItem>
+                                    <asp:ListItem Value="No informa">No informa</asp:ListItem>
+                                </asp:DropDownList>
+                                <label for="ddlGenero">
+                                    Género <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlGenero"
+                                InitialValue=""
+                                CssClass="text-danger" Display="Dynamic"
+                                ErrorMessage="El campo Género es obligatorio."
+                                ValidationGroup="alta" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtFechaNacimiento" runat="server"
+                                    CssClass="form-control" TextMode="Date" />
+                                <label for="txtFechaNacimiento">
+                                    Fecha de Nacimiento <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server" ControlToValidate="txtFechaNacimiento"
+                                CssClass="text-danger" Display="Dynamic"
+                                ErrorMessage="El campo Fecha de nacimiento es obligatorio."
+                                ValidationGroup="alta" />
+                            <asp:CustomValidator ID="cvFechaNac" runat="server"
+                                ControlToValidate="txtFechaNacimiento"
+                                CssClass="text-danger" Display="Dynamic"
+                                ErrorMessage="La fecha debe estar entre 01/01/1900 y hoy."
+                                ValidationGroup="alta"
+                                OnServerValidate="cvFechaNac_ServerValidate" />
+                        </div>
+
+
+                        <!-- CONTACTO -->
+                        <div class="col-12 mt-2">
+                            <h6 class="text-uppercase text-muted mb-2">Contacto</h6>
+                            <hr class="mt-0 mb-3" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtTelefono" runat="server" CssClass="form-control"
+                                    placeholder="Teléfono" MaxLength="15"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                                <label for="txtTelefono">
+                                    Teléfono <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="txtTelefono"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="alta"
+                                ErrorMessage="El campo Teléfono es obligatorio." />
+                            <asp:RegularExpressionValidator runat="server"
+                                ControlToValidate="txtTelefono"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="alta"
+                                ErrorMessage="El teléfono debe tener hasta 15 dígitos numéricos."
+                                ValidationExpression="^[0-9]{1,15}$" />
+                        </div>
+
+
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control"
+                                    TextMode="Email" placeholder="Email" MaxLength="40" />
+                                <label for="txtEmail">
+                                    Email <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="txtEmail"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="alta"
+                                ErrorMessage="El campo Email es obligatorio." />
+                        </div>
+
+
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control"
+                                    placeholder="Dirección" MaxLength="30" />
+                                <label for="txtDireccion">
+                                    Dirección <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="txtDireccion"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="alta"
+                                ErrorMessage="El campo Dirección es obligatorio." />
+                        </div>
+
+
+                        <!-- COBERTURA -->
+                        <div class="col-12 mt-2">
+                            <h6 class="text-uppercase text-muted mb-2">Cobertura</h6>
+                            <hr class="mt-0 mb-3" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <asp:DropDownList ID="ddlObraSocial" runat="server" CssClass="form-select">
+                                    <asp:ListItem Value="">-- Seleccione --</asp:ListItem>
+                                    <asp:ListItem>OSDE</asp:ListItem>
+                                    <asp:ListItem>Swiss Medical</asp:ListItem>
+                                    <asp:ListItem>Galeno</asp:ListItem>
+                                    <asp:ListItem>Medicus</asp:ListItem>
+                                    <asp:ListItem>Omint</asp:ListItem>
+                                    <asp:ListItem>Medifé</asp:ListItem>
+                                    <asp:ListItem>OSECAC</asp:ListItem>
+                                    <asp:ListItem>PAMI</asp:ListItem>
+                                    <asp:ListItem>Unión Personal</asp:ListItem>
+                                    <asp:ListItem>IOMA</asp:ListItem>
+                                    <asp:ListItem>UOM</asp:ListItem>
+                                    <asp:ListItem>OSUTHGRA (Gastronómicos)</asp:ListItem>
+                                    <asp:ListItem>OSCHOCA (Camioneros)</asp:ListItem>
+                                    <asp:ListItem>OSPRERA (Personal Rural)</asp:ListItem>
+                                    <asp:ListItem>OSPSA (Sanidad)</asp:ListItem>
+                                    <asp:ListItem>OSPECON (Construcción)</asp:ListItem>
+                                    <asp:ListItem>OSPE (Petroleros)</asp:ListItem>
+                                    <asp:ListItem>ObSBA (Obra Social de Buenos Aires)</asp:ListItem>
+                                    <asp:ListItem>Otros</asp:ListItem>
+                                    <asp:ListItem>SIN COBERTURA</asp:ListItem>
+                                </asp:DropDownList>
+                                <label for="ddlObraSocial">
+                                    Obra Social / Prepaga <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="ddlObraSocial"
+                                InitialValue=""
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="alta"
+                                ErrorMessage="El campo Obra Social / Prepaga es obligatorio." />
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtNroAfiliado" runat="server" CssClass="form-control"
+                                    placeholder="Nro. Afiliado" MaxLength="10"
+                                    oninput="limpiarAfiliado(this)" />
+                                <label for="txtNroAfiliado">
+                                    Nro. Afiliado <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="txtNroAfiliado"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="alta"
+                                ErrorMessage="El campo Nro. Afiliado es obligatorio." />
+                            <asp:RegularExpressionValidator runat="server"
+                                ControlToValidate="txtNroAfiliado"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="alta"
+                                ErrorMessage="Máximo 10 caracteres alfanuméricos."
+                                ValidationExpression="^[A-Za-z0-9]{1,10}$" />
+                        </div>
+
+
+                    </div>
                 </div>
-                <asp:RequiredFieldValidator ControlToValidate="txtNombre" runat="server"
-                  CssClass="text-danger" ErrorMessage="Nombre obligatorio"
-                  Display="Dynamic" ValidationGroup="alta" />
-              </div>
 
-              <div class="col-md-5">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtApellido" runat="server" CssClass="form-control" placeholder="Apellido" />
-                  <label for="txtApellido">Apellido</label>
+                <div class="modal-footer flex-column flex-sm-row gap-2">
+                    <asp:Button ID="btnGuardarAlta" runat="server" CssClass="btn btn-primary px-4" Text="Guardar"
+                        OnClick="btnGuardarAlta_Click" ValidationGroup="alta" />
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
                 </div>
-                <asp:RequiredFieldValidator ControlToValidate="txtApellido" runat="server"
-                  CssClass="text-danger" ErrorMessage="Apellido obligatorio"
-                  Display="Dynamic" ValidationGroup="alta" />
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Género</label>
-                <asp:DropDownList ID="ddlGenero" runat="server" CssClass="form-select">
-                  <asp:ListItem Value="" Selected="True">-- Seleccione --</asp:ListItem>
-                  <asp:ListItem Value="Masculino">Masculino</asp:ListItem>
-                  <asp:ListItem Value="Femenino">Femenino</asp:ListItem>
-                  <asp:ListItem Value="Otro">Otro</asp:ListItem>
-                  <asp:ListItem Value="No informa">No informa</asp:ListItem>
-                </asp:DropDownList>
-                <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlGenero"
-                  InitialValue="" CssClass="text-danger" Display="Dynamic"
-                  ErrorMessage="Género obligatorio" ValidationGroup="alta" />
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Fecha de Nacimiento</label>
-                <asp:TextBox ID="txtFechaNacimiento" runat="server" CssClass="form-control" TextMode="Date" />
-                <asp:RequiredFieldValidator runat="server" ControlToValidate="txtFechaNacimiento"
-                  CssClass="text-danger" Display="Dynamic"
-                  ErrorMessage="Fecha de nacimiento obligatoria" ValidationGroup="alta" />
-              </div>
-
-              <!-- CONTACTO -->
-              <div class="col-12 mt-2">
-                <h6 class="text-uppercase text-muted mb-2">Contacto</h6>
-                <hr class="mt-0 mb-3" />
-              </div>
-
-              <div class="col-md-4">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtTelefono" runat="server" CssClass="form-control" placeholder="Teléfono" />
-                  <label for="txtTelefono">Teléfono</label>
-                </div>
-              </div>
-
-              <div class="col-md-8">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" TextMode="Email" placeholder="Email" />
-                  <label for="txtEmail">Email</label>
-                </div>
-              </div>
-
-              <div class="col-12">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control" placeholder="Dirección" />
-                  <label for="txtDireccion">Dirección</label>
-                </div>
-              </div>
-
-              <!-- COBERTURA -->
-              <div class="col-12 mt-2">
-                <h6 class="text-uppercase text-muted mb-2">Cobertura</h6>
-                <hr class="mt-0 mb-3" />
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtObraSocial" runat="server" CssClass="form-control" placeholder="Obra Social" />
-                  <label for="txtObraSocial">Obra Social</label>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtNroAfiliado" runat="server" CssClass="form-control" placeholder="Nro. Afiliado" />
-                  <label for="txtNroAfiliado">Nro. Afiliado</label>
-                </div>
-              </div>
-
             </div>
-          </div>
-
-          <div class="modal-footer flex-column flex-sm-row gap-2">
-            <asp:Button ID="btnGuardarAlta" runat="server" CssClass="btn btn-primary px-4" Text="Guardar"
-              OnClick="btnGuardarAlta_Click" ValidationGroup="alta" />
-            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-          </div>
         </div>
-      </div>
     </div>
 
     <!-- ================= MODAL EDICIÓN ================= -->
     <div class="modal fade" id="modalEdit" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header bg-warning">
-            <h5 class="modal-title">
-              <i class="bi bi-pencil-square me-2"></i> Editar Paciente
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-
-          <div class="modal-body">
-            <div class="row g-3">
-
-              <div class="col-12">
-                <h6 class="text-uppercase text-muted mb-2">Identificación</h6>
-                <hr class="mt-0 mb-3" />
-              </div>
-
-              <div class="col-md-3">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtEditDni" runat="server" CssClass="form-control bg-light text-muted"
-                               ReadOnly="true" placeholder="DNI" />
-                  <label for="txtEditDni">DNI</label>
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil-square me-2"></i>Editar Paciente
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-              </div>
 
-              <div class="col-md-4">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtEditNombre" runat="server" CssClass="form-control" placeholder="Nombre" />
-                  <label for="txtEditNombre">Nombre</label>
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        <div class="col-12">
+                            <h6 class="text-uppercase text-muted mb-2">Identificación</h6>
+                            <hr class="mt-0 mb-3" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtEditDni" runat="server" CssClass="form-control bg-light text-muted"
+                                    ReadOnly="true" placeholder="DNI" />
+                                <label for="txtEditDni">DNI</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtEditNombre" runat="server" CssClass="form-control"
+                                    placeholder="Nombre" MaxLength="50" />
+                                <label for="txtEditNombre">
+                                    Nombre <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator ControlToValidate="txtEditNombre" runat="server"
+                                CssClass="text-danger"
+                                ErrorMessage="El campo Nombre es obligatorio."
+                                Display="Dynamic" ValidationGroup="edit" />
+                            <asp:RegularExpressionValidator runat="server"
+                                ControlToValidate="txtEditNombre"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="edit"
+                                ErrorMessage="El nombre no puede contener números."
+                                ValidationExpression="^([A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+)$" />
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtEditApellido" runat="server" CssClass="form-control"
+                                    placeholder="Apellido" MaxLength="50" />
+                                <label for="txtEditApellido">
+                                    Apellido <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator ControlToValidate="txtEditApellido" runat="server"
+                                CssClass="text-danger"
+                                ErrorMessage="El campo Apellido es obligatorio."
+                                Display="Dynamic" ValidationGroup="edit" />
+                            <asp:RegularExpressionValidator runat="server"
+                                ControlToValidate="txtEditApellido"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="edit"
+                                ErrorMessage="El apellido no puede contener números."
+                                ValidationExpression="^([A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+)$" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <asp:DropDownList ID="ddlEditGenero" runat="server" CssClass="form-select">
+                                    <asp:ListItem Value="" Selected="True">-- Seleccione --</asp:ListItem>
+                                    <asp:ListItem Value="Masculino">Masculino</asp:ListItem>
+                                    <asp:ListItem Value="Femenino">Femenino</asp:ListItem>
+                                    <asp:ListItem Value="Otro">Otro</asp:ListItem>
+                                    <asp:ListItem Value="No informa">No informa</asp:ListItem>
+                                </asp:DropDownList>
+                                <label for="ddlEditGenero">
+                                    Género <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlEditGenero"
+                                InitialValue=""
+                                CssClass="text-danger" Display="Dynamic"
+                                ErrorMessage="El campo Género es obligatorio."
+                                ValidationGroup="edit" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtEditFechaNac" runat="server" CssClass="form-control"
+                                    TextMode="Date" />
+                                <label for="txtEditFechaNac">
+                                    Fecha de Nacimiento <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="txtEditFechaNac"
+                                CssClass="text-danger" Display="Dynamic"
+                                ErrorMessage="El campo Fecha de nacimiento es obligatorio."
+                                ValidationGroup="edit" />
+                            <asp:CustomValidator ID="cvEditFechaNac" runat="server"
+                                ControlToValidate="txtEditFechaNac"
+                                CssClass="text-danger" Display="Dynamic"
+                                ErrorMessage="La fecha debe estar entre 01/01/1900 y hoy."
+                                ValidationGroup="edit"
+                                OnServerValidate="cvEditFechaNac_ServerValidate" />
+                        </div>
+
+
+
+                        <div class="col-12 mt-2">
+                            <h6 class="text-uppercase text-muted mb-2">Contacto</h6>
+                            <hr class="mt-0 mb-3" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtEditTelefono" runat="server" CssClass="form-control"
+                                    placeholder="Teléfono" MaxLength="15"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                                <label for="txtEditTelefono">
+                                    Teléfono <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="txtEditTelefono"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="edit"
+                                ErrorMessage="El campo Teléfono es obligatorio." />
+                            <asp:RegularExpressionValidator runat="server"
+                                ControlToValidate="txtEditTelefono"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="edit"
+                                ErrorMessage="El teléfono debe tener hasta 15 dígitos numéricos."
+                                ValidationExpression="^[0-9]{1,15}$" />
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtEditEmail" runat="server" CssClass="form-control"
+                                    TextMode="Email" placeholder="Email" MaxLength="40" />
+                                <label for="txtEditEmail">
+                                    Email <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="txtEditEmail"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="edit"
+                                ErrorMessage="El campo Email es obligatorio." />
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtEditDireccion" runat="server" CssClass="form-control"
+                                    placeholder="Dirección" MaxLength="30" />
+                                <label for="txtEditDireccion">
+                                    Dirección <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="txtEditDireccion"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="edit"
+                                ErrorMessage="El campo Dirección es obligatorio." />
+                        </div>
+
+                        <div class="col-12 mt-2">
+                            <h6 class="text-uppercase text-muted mb-2">Cobertura</h6>
+                            <hr class="mt-0 mb-3" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <asp:DropDownList ID="ddlEditObraSocial" runat="server" CssClass="form-select">
+                                    <asp:ListItem>OSDE</asp:ListItem>
+                                    <asp:ListItem>Swiss Medical</asp:ListItem>
+                                    <asp:ListItem>Galeno</asp:ListItem>
+                                    <asp:ListItem>Medicus</asp:ListItem>
+                                    <asp:ListItem>Omint</asp:ListItem>
+                                    <asp:ListItem>Medifé</asp:ListItem>
+                                    <asp:ListItem>OSECAC</asp:ListItem>
+                                    <asp:ListItem>PAMI</asp:ListItem>
+                                    <asp:ListItem>Unión Personal</asp:ListItem>
+                                    <asp:ListItem>IOMA</asp:ListItem>
+                                    <asp:ListItem>UOM</asp:ListItem>
+                                    <asp:ListItem>OSUTHGRA (Gastronómicos)</asp:ListItem>
+                                    <asp:ListItem>OSCHOCA (Camioneros)</asp:ListItem>
+                                    <asp:ListItem>OSPRERA (Personal Rural)</asp:ListItem>
+                                    <asp:ListItem>OSPSA (Sanidad)</asp:ListItem>
+                                    <asp:ListItem>OSPECON (Construcción)</asp:ListItem>
+                                    <asp:ListItem>OSPE (Petroleros)</asp:ListItem>
+                                    <asp:ListItem>ObSBA (Obra Social de Buenos Aires)</asp:ListItem>
+                                    <asp:ListItem>Otros</asp:ListItem>
+                                    <asp:ListItem>SIN COBERTURA</asp:ListItem>
+                                </asp:DropDownList>
+                                <label for="ddlEditObraSocial">
+                                    Obra Social / Prepaga <span class="required-star">*</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <asp:TextBox ID="txtEditNroAfiliado" runat="server" CssClass="form-control"
+                                    placeholder="Nro. Afiliado" MaxLength="10"
+                                    oninput="limpiarAfiliado(this)" />
+                                <label for="txtEditNroAfiliado">
+                                    Nro. Afiliado <span class="required-star">*</span>
+                                </label>
+                            </div>
+                            <asp:RequiredFieldValidator runat="server"
+                                ControlToValidate="txtEditNroAfiliado"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="edit"
+                                ErrorMessage="El campo Nro. Afiliado es obligatorio." />
+                            <asp:RegularExpressionValidator runat="server"
+                                ControlToValidate="txtEditNroAfiliado"
+                                CssClass="text-danger"
+                                Display="Dynamic"
+                                ValidationGroup="edit"
+                                ErrorMessage="Máximo 10 caracteres alfanuméricos."
+                                ValidationExpression="^[A-Za-z0-9]{1,10}$" />
+                        </div>
+
+
+
+                    </div>
                 </div>
-              </div>
 
-              <div class="col-md-5">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtEditApellido" runat="server" CssClass="form-control" placeholder="Apellido" />
-                  <label for="txtEditApellido">Apellido</label>
+                <div class="modal-footer flex-column flex-sm-row gap-2">
+                    <asp:Button ID="btnGuardarEdicion" runat="server"
+                        CssClass="btn btn-warning px-4" Text="Guardar cambios"
+                        OnClick="btnGuardarEdicion_Click" ValidationGroup="edit" />
+
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
                 </div>
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Género</label>
-                <asp:DropDownList ID="ddlEditGenero" runat="server" CssClass="form-select">
-                  <asp:ListItem Value="Masculino">Masculino</asp:ListItem>
-                  <asp:ListItem Value="Femenino">Femenino</asp:ListItem>
-                  <asp:ListItem Value="Otro">Otro</asp:ListItem>
-                  <asp:ListItem Value="No informa">No informa</asp:ListItem>
-                </asp:DropDownList>
-              </div>
-
-              <div class="col-md-4">
-                <label class="form-label">Fecha de Nacimiento</label>
-                <asp:TextBox ID="txtEditFechaNac" runat="server" CssClass="form-control" TextMode="Date" />
-              </div>
-
-              <div class="col-12 mt-2">
-                <h6 class="text-uppercase text-muted mb-2">Contacto</h6>
-                <hr class="mt-0 mb-3" />
-              </div>
-
-              <div class="col-md-4">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtEditTelefono" runat="server" CssClass="form-control" placeholder="Teléfono" />
-                  <label for="txtEditTelefono">Teléfono</label>
-                </div>
-              </div>
-
-              <div class="col-md-8">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtEditEmail" runat="server" CssClass="form-control" TextMode="Email" placeholder="Email" />
-                  <label for="txtEditEmail">Email</label>
-                </div>
-              </div>
-
-              <div class="col-12">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtEditDireccion" runat="server" CssClass="form-control" placeholder="Dirección" />
-                  <label for="txtEditDireccion">Dirección</label>
-                </div>
-              </div>
-
-              <div class="col-12 mt-2">
-                <h6 class="text-uppercase text-muted mb-2">Cobertura</h6>
-                <hr class="mt-0 mb-3" />
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtEditObraSocial" runat="server" CssClass="form-control" placeholder="Obra Social" />
-                  <label for="txtEditObraSocial">Obra Social</label>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-floating">
-                  <asp:TextBox ID="txtEditNroAfiliado" runat="server" CssClass="form-control" placeholder="Nro. Afiliado" />
-                  <label for="txtEditNroAfiliado">Nro. Afiliado</label>
-                </div>
-              </div>
-
             </div>
-          </div>
-
-          <div class="modal-footer flex-column flex-sm-row gap-2">
-            <asp:Button ID="btnGuardarEdicion" runat="server" CssClass="btn btn-warning px-4" Text="Guardar cambios"
-              OnClick="btnGuardarEdicion_Click" />
-            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-          </div>
         </div>
-      </div>
     </div>
 
 
     <!-- ================= MODAL ELIMINAR ================= -->
     <div class="modal fade" id="modalDelete" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header bg-danger text-white">
-            <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i> Confirmar eliminación</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            <p>¿Seguro que querés eliminar al paciente?</p>
-            <ul class="mb-0">
-              <li><strong>Id:</strong> <span id="delId"></span></li>
-              <li><strong>DNI:</strong> <span id="delDni"></span></li>
-              <li><strong>Nombre:</strong> <span id="delNombre"></span></li>
-            </ul>
-          </div>
-          <div class="modal-footer">
-            <asp:Button ID="btnConfirmarDelete" runat="server" CssClass="btn btn-danger" Text="Eliminar" OnClick="btnConfirmarDelete_Click" />
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-          </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Seguro que querés eliminar al paciente?</p>
+                    <ul class="mb-0">
+                        <li><strong>Id:</strong> <span id="delId"></span></li>
+                        <li><strong>DNI:</strong> <span id="delDni"></span></li>
+                        <li><strong>Nombre:</strong> <span id="delNombre"></span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <asp:Button ID="btnConfirmarDelete" runat="server" CssClass="btn btn-danger" Text="Eliminar" OnClick="btnConfirmarDelete_Click" />
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- ============== MODAL REGISTRAR INGRESO ============== -->
     <div class="modal fade" id="modalIngreso" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header bg-success text-white">
-            <h5 class="modal-title">
-              <i class="bi bi-clipboard-plus me-2"></i> Registrar ingreso a guardia
-            </h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-
-          <div class="modal-body">
-            <div class="row g-3">
-              <div class="col-12">
-                <div class="alert alert-info mb-3">
-                  <strong>Paciente:</strong> <span id="ingresoPacienteNombre"></span>
-                  <span class="ms-3"><strong>DNI:</strong> <span id="ingresoPacienteDni"></span></span>
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-clipboard-plus me-2"></i>Registrar ingreso a guardia
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-              </div>
 
-              <div class="col-12">
-                <label class="form-label">Descripción / motivo de consulta</label>
-                <asp:TextBox ID="txtDescSintomas" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="4"
-                             placeholder="Escribí lo que te cuenta el paciente..."></asp:TextBox>
-                <small class="text-muted">
-                    El sistema calculará el estado (<strong>Espera</strong>) y la prioridad automáticamente. 
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="alert alert-info mb-3">
+                                <strong>Paciente:</strong> <span id="ingresoPacienteNombre"></span>
+                                <span class="ms-3"><strong>DNI:</strong> <span id="ingresoPacienteDni"></span></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Descripción / motivo de consulta</label>
+                            <asp:TextBox ID="txtDescSintomas" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="4"
+                                placeholder="Escribí lo que te cuenta el paciente..."></asp:TextBox>
+                            <small class="text-muted">El sistema calculará el estado (<strong>Espera</strong>) y la prioridad automáticamente. 
                     Los resultados arrojados serán evaluados por un enfermero.
-                </small>
-              </div>
+                            </small>
+                        </div>
 
-              <div class="col-12 d-flex align-items-center gap-3">
-                <span>Prioridad estimada: </span>
-                <span id="prioridadBadge" class="badge rounded-pill bg-secondary px-3 py-2">–</span>
-              </div>
-            </div>
-          </div>
+                        <div class="col-12 d-flex align-items-center gap-3">
+                            <span>Prioridad estimada: </span>
+                            <span id="prioridadBadge" class="badge rounded-pill bg-secondary px-3 py-2">–</span>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="modal-footer flex-column flex-sm-row gap-2">
-            <asp:Button ID="btnConfirmarIngreso" runat="server" CssClass="btn btn-success px-4"
+                <div class="modal-footer flex-column flex-sm-row gap-2">
+                    <asp:Button ID="btnConfirmarIngreso" runat="server" CssClass="btn btn-success px-4"
                         Text="Confirmar ingreso" OnClick="btnConfirmarIngreso_Click" />
-            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-          </div>
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- Scripts específicos de la página (Bootstrap JS ya está en el master) -->
@@ -461,23 +756,23 @@
             document.getElementById("<%= ddlEditGenero.ClientID %>").value = genero;
             document.getElementById("<%= txtEditTelefono.ClientID %>").value = telefono;
             document.getElementById("<%= txtEditEmail.ClientID %>").value = email;
-            document.getElementById("<%= txtEditObraSocial.ClientID %>").value = obra;
+            document.getElementById("<%= ddlEditObraSocial.ClientID %>").value = obra;
             document.getElementById("<%= txtEditNroAfiliado.ClientID %>").value = afiliado;
             document.getElementById("<%= txtEditFechaNac.ClientID %>").value = fechaNac;
-            document.getElementById("<%= txtEditDireccion.ClientID %>").value = Direccion; 
+            document.getElementById("<%= txtEditDireccion.ClientID %>").value = Direccion;
 
             var modal = new bootstrap.Modal(document.getElementById('modalEdit'));
             modal.show();
-      }
+        }
 
-      function openDeleteModal(id, dni, nombreCompleto) {
-        document.getElementById("<%= hfDeleteId.ClientID %>").value = id;
-        document.getElementById("delId").innerText = id;
-        document.getElementById("delDni").innerText = dni;
-        document.getElementById("delNombre").innerText = nombreCompleto;
-        var modal = new bootstrap.Modal(document.getElementById('modalDelete'));
-        modal.show();
-      }
+        function openDeleteModal(id, dni, nombreCompleto) {
+            document.getElementById("<%= hfDeleteId.ClientID %>").value = id;
+            document.getElementById("delId").innerText = id;
+            document.getElementById("delDni").innerText = dni;
+            document.getElementById("delNombre").innerText = nombreCompleto;
+            var modal = new bootstrap.Modal(document.getElementById('modalDelete'));
+            modal.show();
+        }
     </script>
 
     <script>
@@ -512,10 +807,10 @@
 
             // escuchar cambios para recalcular prioridad (Enfermero)
             setTimeout(() => {
-              document.getElementById("<%= txtDescSintomas.ClientID %>").oninput = function () {
-                const prioridad = calcularPrioridad(this.value || "");
-                setPrioridadPreview(prioridad);
-                document.getElementById("<%= hfIngresoPrioridad.ClientID %>").value = prioridad;
+                document.getElementById("<%= txtDescSintomas.ClientID %>").oninput = function () {
+                    const prioridad = calcularPrioridad(this.value || "");
+                    setPrioridadPreview(prioridad);
+                    document.getElementById("<%= hfIngresoPrioridad.ClientID %>").value = prioridad;
                 };
             }, 0);
 

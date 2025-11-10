@@ -263,7 +263,7 @@ namespace SistemaGuardiaClinica.Enfermeria
                 if (int.TryParse(ddlEspecialista.SelectedValue, out medicoId) && medicoId > 0)
                 {
                     g.MedicoId = medicoId;
-                    g.Estado = "Atencion";   //Si sale de "Espera" y va a médicos
+                    g.Estado = "Triaje";   //Si sale de "Espera" y va a médicos
                 }
                 else
                 {

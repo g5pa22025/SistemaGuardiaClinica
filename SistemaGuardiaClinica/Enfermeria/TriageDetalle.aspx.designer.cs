@@ -69,6 +69,15 @@ namespace SistemaGuardiaClinica.Enfermeria
         protected global::System.Web.UI.WebControls.TextBox txtTemperatura;
 
         /// <summary>
+        /// Control revTemperatura.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revTemperatura;
+
+        /// <summary>
         /// Control txtFc.
         /// </summary>
         /// <remarks>
@@ -78,6 +87,15 @@ namespace SistemaGuardiaClinica.Enfermeria
         protected global::System.Web.UI.WebControls.TextBox txtFc;
 
         /// <summary>
+        /// Control revFc.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revFc;
+
+        /// <summary>
         /// Control txtFr.
         /// </summary>
         /// <remarks>
@@ -85,6 +103,15 @@ namespace SistemaGuardiaClinica.Enfermeria
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtFr;
+
+        /// <summary>
+        /// Control revFr.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revFr;
 
         /// <summary>
         /// Control txtPaSistolica.
@@ -105,6 +132,24 @@ namespace SistemaGuardiaClinica.Enfermeria
         protected global::System.Web.UI.WebControls.TextBox txtPaDiastolica;
 
         /// <summary>
+        /// Control revPaSis.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revPaSis;
+
+        /// <summary>
+        /// Control revPaDia.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revPaDia;
+
+        /// <summary>
         /// Control txtSpo2.
         /// </summary>
         /// <remarks>
@@ -112,6 +157,15 @@ namespace SistemaGuardiaClinica.Enfermeria
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtSpo2;
+
+        /// <summary>
+        /// Control revSpo2.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revSpo2;
 
         /// <summary>
         /// Control txtGlucemia.
@@ -123,6 +177,15 @@ namespace SistemaGuardiaClinica.Enfermeria
         protected global::System.Web.UI.WebControls.TextBox txtGlucemia;
 
         /// <summary>
+        /// Control revGlucemia.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revGlucemia;
+
+        /// <summary>
         /// Control txtGlasgow.
         /// </summary>
         /// <remarks>
@@ -130,6 +193,15 @@ namespace SistemaGuardiaClinica.Enfermeria
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtGlasgow;
+
+        /// <summary>
+        /// Control revGlasgow.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revGlasgow;
 
         /// <summary>
         /// Control ddlEspecialidad.

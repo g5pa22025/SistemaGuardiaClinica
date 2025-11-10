@@ -56,7 +56,7 @@ namespace Datos.Repositorios
         {
             return _context.Guardias
             .Include(g => g.Paciente)
-            .Where(g => g.MedicoId == medicoId && g.Estado == "Atencion")
+            .Where(g => g.MedicoId == medicoId && g.Estado == "Triaje")
             .OrderBy(g => g.PrioridadFinal ?? int.MaxValue)
             .ThenBy(g => g.FechaIngreso)
             .ToList();
@@ -67,7 +67,7 @@ namespace Datos.Repositorios
             return _context.Guardias
                 .Include(g => g.Paciente)
                 .FirstOrDefault(g => g.PacienteId == pacienteId &&
-                                   (g.Estado == "Espera" || g.Estado == "Triaje" || g.Estado == "Atencion"));
+                                   (g.Estado == "Espera" || g.Estado == "Triaje" || g.Estado == "Triaje"));
         }
 
         public List<Guardia> ObtenerTodos()

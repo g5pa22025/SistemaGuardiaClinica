@@ -8,18 +8,48 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 
     <style>
-        body { background: #f6f8fb; }
-        .card { border-radius: 1rem; }
-        .table td, .table th { vertical-align: middle; }
-        .row-pr-1, .row-pr-2 { --bs-table-bg: #edf7ee; }
-        .row-pr-3, .row-pr-4 { --bs-table-bg: #fff7e6; }
-        .row-pr-5 { --bs-table-bg: #fdecea; }
+        body {
+            background: #f6f8fb;
+        }
+
+        .card {
+            border-radius: 1rem;
+        }
+
+        .table td, .table th {
+            vertical-align: middle;
+        }
+
+        .row-pr-1 {
+            --bs-table-bg: #fdecea;
+        }
+        /* Rojo suave - P1 (Inmediato) */
+        .row-pr-2 {
+            --bs-table-bg: #fff3cd;
+        }
+        /* Naranja suave - P2 (Muy urgente) */
+        .row-pr-3 {
+            --bs-table-bg: #fff7e6;
+        }
+        /* Amarillo suave - P3 (Urgente) */
+        .row-pr-4 {
+            --bs-table-bg: #edf7ee;
+        }
+        /* Verde suave - P4 (Menos urgente) */
+        .row-pr-5 {
+            --bs-table-bg: #e7f1ff;
+        }
+        /* Azul suave - P5 (No urgente) */
+        .bg-prio-orange {
+            background-color: #fd7e14 !important;
+        }
+        /* Naranja Bootstrap-like */
     </style>
 
     <div class="container py-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h4 class="mb-0">
-                <i class="bi bi-person-check me-2"></i> Pacientes Triageados (Listos para consulta)
+                <i class="bi bi-person-check me-2"></i>Pacientes Triageados (Listos para consulta)
             </h4>
         </div>
 
@@ -35,7 +65,7 @@
                                     <th>Fecha Ingreso</th>
                                     <th>DNI</th>
                                     <th>Paciente</th>
-                                    <th style="width:40%">Síntomas (Triage)</th>
+                                    <th style="width: 40%">Síntomas (Triage)</th>
                                     <th>Prioridad</th>
                                     <th class="text-end" style="width: 220px;"></th>
                                 </tr>
@@ -55,18 +85,18 @@
                     </td>
                     <td class="text-end">
                         <button type="button" class="btn btn-sm btn-primary"
-                           onclick='openConsultaModal(
+                            onclick='openConsultaModal(
                                 "<%# Eval("Id") %>",
                                 "<%# (Eval("Paciente.Apellido") + ", " + Eval("Paciente.Nombre")).ToString().Replace("\"","\\\"") %>"
                             )'>
-                            <i class="bi bi-play-circle me-1"></i> Iniciar Consulta
+                            <i class="bi bi-play-circle me-1"></i>Iniciar Consulta
                         </button>
                     </td>
                 </tr>
             </ItemTemplate>
 
             <FooterTemplate>
-                            </tbody>
+                </tbody>
                         </table>
                     </div>
                 </div>
@@ -81,7 +111,7 @@
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">
-                        <i class="bi bi-file-earmark-medical me-2"></i> Consulta Médica
+                        <i class="bi bi-file-earmark-medical me-2"></i>Consulta Médica
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
@@ -100,7 +130,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                    
+
                     <asp:Button ID="btnFinalizarConsulta" runat="server" CssClass="btn btn-primary px-4"
                         Text="Finalizar Consulta" OnClick="btnFinalizarConsulta_Click" />
                 </div>
